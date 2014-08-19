@@ -1,0 +1,96 @@
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../bower_components/core-menu-button/core-menu-button.html">
+<link rel="import" href="../bower_components/core-iconset-svg/core-iconset-svg.html">
+
+<polymer-element name="mypoly-drawingmenu">
+ <template>
+ <style>
+ paper-icon-button{
+     color: black;
+ }
+ </style>
+ 
+ <core-iconset-svg id="custom-icons" iconSize="20">
+  <svg>
+    <defs>
+      <g id="myline">
+        <line x1="0" y1="0" x2="20" y2="20" style="stroke:{{selectedLine.stroke}};stroke-width:2" />
+      </g>
+      <g id="mypolygon">
+        <polygon points="22,1 30,21 17,25 12,23" style="fill:{{selectedPolygon.fill}};stroke:{{selectedPolygon.stroke}};stroke-width:1" />
+     </g>
+    </defs>
+  </svg>
+</core-iconset-svg>
+ 
+ 
+ 
+ <core-ajax
+    auto
+    url="../config/default.json"
+    handleAs="json"
+    on-core-response="{{handleResponse}}"></core-ajax>
+    
+    <paper-menu-button src="./images/mapicons/{{selectedIcon.url}}">
+        <template repeat="{{icon,i in icons}}">
+            <core-item><paper-icon-button iconSrc="./images/mapicons/{{icon.url}}" label="{{icon.text}}" on-tap="{{buttonClick}}" nr="{{i}}"></paper-icon-button></core-item>
+        </template>
+    </paper-menu-button>
+    
+    <core-menu-button icon="custom-icons:myline">
+        <template repeat="{{line,i in lines}}">
+            <core-item on-tap="{{lineClick}}" nr="{{i}}">
+                <svg height="21" width="21">
+                    <line x1="0" y1="0" x2="20" y2="20" style="stroke:{{line.stroke}};stroke-width:2" />
+                </svg>
+                </button>
+            </core-item>
+        </template>
+    </core-menu-button>
+    
+    <core-menu-button icon="custom-icons:mypolygon">
+        <template repeat="{{polygon,i in polygons}}">
+            <core-item on-tap="{{polygonClick}}" nr="{{i}}">
+              <svg height="21" width="21">
+                <polygon points="22,1 30,21 17,25 12,23" style="fill:{{polygon.fill}};stroke:{{polygon.stroke}};stroke-width:1" />
+              </svg>
+            </core-item>
+        </template>
+    </core-menu-button>
+    
+ </template>
+ <script>
+Polymer('mypoly-drawingmenu',{
+        icons: [],
+        lines: [],
+        polygons: [],
+        selectedIcon: {url: "",text: ""},
+        selectedLine: {stroke: "red"},
+        selectedPolygon: {stroke: "red", fill: "red"},
+        ready: function(){
+        },
+        handleResponse: function(response){
+            this.icons = response.detail.response.icontypes;
+            this.lines = response.detail.response.linestyles;
+            this.polygons = response.detail.response.polygonstyles;
+            this.selectedIcon = this.icons[0];
+            this.selectedLine = this.lines[0];
+            this.selectedPolygon = this.polygons[0];
+        },
+        buttonClick: function(a,b,c){
+            this.selectedIcon = this.icons[c.getAttribute('nr')];
+            var url = a.currentTarget.iconSrc_;
+            this.fire('draw',{type: 'Point', url: url});
+        },
+        lineClick: function(a,b,c){
+            this.selectedLine = this.lines[c.getAttribute('nr')];
+            this.fire('draw',{type: 'LineString', stroke: this.selectedLine.stroke});
+        },
+        polygonClick: function(a,b,c){
+            this.selectedPolygon = this.polygons[c.getAttribute('nr')];
+            this.fire('draw',{type: 'Polygon', stroke: this.selectedPolygon.stroke, fill: this.selectedPolygon.fill});
+        }
+});
+</script>
+</polymer-element>

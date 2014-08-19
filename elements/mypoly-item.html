@@ -1,0 +1,108 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
+
+<polymer-element name="mypoly-item" attributes="item">
+ <template>
+ <style>
+    :host {
+      display: block;
+      position: relative;
+      background-color: white;
+      padding: 2px;
+      margin: 5px;
+      width: 100%;
+      font-size: 0.8rem;
+      font-weight: 300;
+    }
+    .card-header {
+      margin-bottom: 3px;
+    }
+    polyfill-next-selector { content: '.card-header h2'; }
+    .card-header ::content h2 {
+      margin: 0;
+      font-size: 1.0rem;
+      font-weight: 300;
+    }
+    polyfill-next-selector { content: '.card-header img'; }
+    .card-header ::content img {
+      width: 70px;
+      border-radius: 50%;
+      margin: 1px;
+    }
+    .icons {
+      position: absolute;
+      bottom: 3px;
+      right: 3px;
+      fill: #636363;
+    }
+    core-icon-button {
+      
+    }
+    :host([favorite]) core-icon-button {
+      color: #da4336;
+    }
+    
+    :host([active]) {
+        background: gainsboro;
+    }
+    
+    </style>
+    
+    <div class="card-header" layout horizontal center>
+       <content select="h2"></content>
+    </div>
+    <content>
+            
+    </content>
+    <div class="icons">
+        <core-icon-button
+          id="edit"
+          icon="save"
+          on-tap="{{saveTapped}}">
+        </core-icon-button>
+        <core-icon-button
+          id="favicon"
+          icon="delete"
+          on-tap="{{favoriteTapped}}">
+        </core-icon-button>
+    </div>
+  </template>
+  <script>
+  Polymer('mypoly-item', {
+      item: null,
+      save: function(){
+          console.log('Itemchange');
+      },
+      ready: function(){
+          this.object = this.item;
+      },
+      publish: {
+        favorite: {
+          value: false,
+          reflect: true
+        },
+        active: {
+          value: false,
+          reflect: true
+        }
+      },
+      favoriteTapped: function(event, detail, sender) {
+        this._deleted = !this._deleted;
+        this.fire('favorite-tap');
+      },
+      saveTapped: function(event, detail, sender){
+          sender.templateInstance.model.item.sync();
+          this.fire('edit-tap');
+          console.log('Saved');
+      },
+      changed: function(){
+          console.log('Change');
+      },
+      fromtimestamp: function(timestamp){
+        return new Date(timestamp).toLocaleString();
+      }
+      
+    });
+    
+  </script>
+</polymer-element>

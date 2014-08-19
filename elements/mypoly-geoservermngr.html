@@ -1,0 +1,74 @@
+<polymer-element name="d3-geoservermngr">
+  <template>
+   <style>
+  
+   core-item {
+      height: 60px;
+      padding: 2px;
+      background-color: #efefef;
+      border: 1px solid #ddd;
+    }
+
+    core-item .name {
+      font-size: 0.75em;
+    }
+
+    core-item .address {
+      font-size: 0.75em;
+    }
+
+   
+   </style>
+   <h2>Catalog</h2>
+   <paper-input id="getcapurl" label="URL" value = '/service/osgis_geoserver'></paper-input><br>
+   <core-icon-button icon="menu" on-click={{getcap}}></core-icon-button>
+   <template repeat="{{workspace in workspaces}}">
+        <core-item on-click={{openworkspace}}>
+        <div flex>
+            <span class='name'>{{workspace.name}}</span>
+        </div>
+        </core-item>
+        <template repeat="{{layer in workspace.layers}}">
+            <div on-click={{addlayer}}><small>{{layer.name}}</small></div>
+        </template>
+        
+   </template>
+   
+   <content>
+   </content>
+  </template>
+  <script>
+  Polymer('d3-geoservermngr', {
+      url: null,
+      map: null,
+      workspaces: [],
+      getcap: function(e){
+          var url = this.$.getcapurl.value;
+          this.url = url;
+          var self = this;
+          d3.json(url+'/rest/workspaces.json', function(json) {
+              self.workspaces = json.workspaces.workspace;
+          });
+      },
+      openworkspace: function(a,b,c){
+          var self = this;
+          var workspace = c.templateInstance.model.workspace;
+          var url = this.url + '/rest/workspaces/' + workspace.name + '/featuretypes.json';
+          d3.json(url, function(d){
+                  console.log(d);
+                  workspace.layers = d.featureTypes.featureType;
+          });
+          
+      },
+      addlayer: function(a,b,c){
+          var layername = c.templateInstance.model.layer.name;
+          var layer = new d3map.rasterlayer(layername, this.map, {
+            type: 'wms',
+            url: this.url + '/wms?',
+            layers: layername
+         });
+         this.map.addLayer(layer);
+      }
+  });
+  </script>
+</polymer-element>

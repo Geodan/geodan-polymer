@@ -1,0 +1,50 @@
+<polymer-element name="d3-maplayer" attributes="id">
+  <template>
+   <style>
+   
+   </style>
+  </template>
+  <script>
+  Polymer('d3-maplayer', {
+     data: [],
+     attached: function(){
+         var self = this;
+         var map = this.parentNode.map;
+         this.map = map;
+         var onclick = function(d,e){
+             //Added for testing
+             //d3.event.stopPropagation();
+             //self.map.draw({feature: d});
+         }
+         
+         
+         this.layer = new d3map.vectorlayer(this.id, map, {
+            type: 'path',
+            labels: true,
+            opacity: 1,
+            visible: true,
+            labelconfig: {
+                field: 'name',
+                minzoom: 171157,
+                style: {
+                    stroke: 'steelBlue'
+                }
+            },
+            style: {
+                'fill-opacity':0.5,
+                'stroke-width': 4
+            },
+            onclick: onclick,
+      
+         });
+         this.layer.data(this.data);
+         map.addLayer(this.layer);
+         map.redraw();
+     },
+     newdata: function(d){
+         this.layer.data(d);
+         this.parentNode.map.redraw();
+     }
+  });
+  </script>
+</polymer-element>

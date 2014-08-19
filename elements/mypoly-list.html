@@ -1,0 +1,175 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/juicy-jsoneditor/src/juicy-jsoneditor.html">
+ <!-- josdejong/jsoneditor#104 workaround-->
+<link rel="stylesheet" type="text/css" href="../bower_components/jsoneditor/jsoneditor.min.css">
+<link rel="import" href="mypoly-item.html">
+
+<polymer-element name="mypoly-list" attributes="store show cols">
+<template>
+    <style>
+
+      core-header-panel {
+        height: 100%;
+        overflow: auto;
+        width: 100%;
+        float: left;
+        -webkit-overflow-scrolling: touch; 
+      }
+      core-toolbar {
+        background: #03a9f4;
+        color: white;
+      }
+      #tabs {
+        width: 100%;
+        margin: 0;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .container {
+        width: 100%;
+        margin: 50px auto;
+      }
+      @media (min-width: 481px) {
+        #tabs {
+          width: 100%;
+        }
+        .container {
+          width: 100%;
+        }
+      }
+    :host {
+      display: block;
+      width: 100%;
+    }
+    mypoly-item {
+      margin-bottom: 5px;
+    }
+    </style>
+    
+    <post-service id="service" data="{{items}}"></post-service>
+    <core-header-panel>
+        <core-toolbar>
+            <h2>{{store}}</h2>
+            <paper-tabs id="tabs" selected="all" on-core-activate={{toggleList}} self-end>
+                <paper-tab name="all">ACTIVE</paper-tab>
+                <paper-tab name="favorites">DELETED</paper-tab>
+           </paper-tabs>
+        </core-toolbar>
+
+        <template repeat="{{item in items}}">
+         <mypoly-item
+            item="{{item}}"
+            favorite="{{item._deleted}}"
+            on-favorite-tap="{{handleFavorite}}"
+            on-edit-tap="{{handleEdit}}"
+            on-tap="{{activate}}"
+            hidden?="{{(show == 'favorites' && !item._deleted) || (show != 'favorites' && item._deleted)}}"
+            active?="{{item._id == _activeid}}">
+            
+            <h2>{{item._data.name || item._data.ip || item._data.userid || '--'}}</h2>
+            <juicy-jsoneditor json={{item._data}}></juicy-jsoneditor>
+            <!--
+            <p>
+            <template repeat="{{col in columns}}">
+                <paper-input on-change='{{changed}}' floatingLabel=true label="{{col}}" value={{item._data[col]}}></paper-input>
+            </template>
+            </p>
+            -->
+            <p>
+            <small>Created: {{item._created | fromtimestamp}}</small><br>
+            <small>Last update: {{item._updated | fromtimestamp}}</small>
+            </p>
+            
+         </mypoly-item>
+         
+       </template>
+    </core-header-panel>
+</template>
+
+<script>
+(function() {
+Polymer('mypoly-list', {
+    toggleList: function(x,y,z){
+        //TODO: aaaaargh...
+        this.show = x.detail.item.attributes[0].value;
+    },
+    ready: function() {
+        var self = this;
+        if (this.cols){
+            this.columns = this.cols.split(" ");
+        }
+        else this.columns = [];
+        if (this.store == 'users' ){
+            this.items = core.users();
+        }
+        if (this.store == 'socketservers' ){
+            this.items = core.socketservers();
+        }
+        else if (this.store == 'projects'){
+            this.items = core.projects();
+        }
+        else if (this.store == 'peers'){
+            this.items = core.peers();
+        }
+        else if (this.store == 'items'){
+            this.items = [];
+        }
+        
+    },
+    
+    writeout: function(data){
+        var string = "";
+        _.each(data, function(x,i){
+            string +=  i + x + "\n";
+        })
+        return string;
+    },
+    activate: function(event, detail, sender){
+        var item = sender.templateInstance.model.item;
+        this._activeid = item._id;
+        if (this.store == 'users'){
+            core.user(item._id);
+        }
+        if (this.store == 'socketservers' ){
+            core.socketserver(item._id);
+        }
+        if (this.store == 'projects'){
+            core.project(item._id);
+        }
+        this.fire('activate-tap',{id: item._id});
+    },
+    handleFavorite: function(event, detail, sender) {
+        var item = sender.templateInstance.model.item;
+        item._deleted = !item._deleted;
+        if (this.store == 'users' ){
+            core.users(item._id).deleted(item._deleted).sync();
+        }
+        if (this.store == 'socketservers' ){
+            core.socketservers(item._id).deleted(item._deleted).sync();
+        }
+        if (this.store == 'projects' ){
+            core.projects(item._id).deleted(item._deleted).sync();
+        }
+        if (this.store == 'peers' ){
+            core.peers(item._id).deleted(item._deleted).sync();
+        }
+    },
+    handleEdit: function(event, detail, sender){
+        var item = sender.templateInstance.model.item;
+        this.fire('edit-tap', {item: item});
+    },
+    changed: function(e, detail, sender) {
+      var item = e.target.templateInstance.model.item;
+      item.sync();
+      //this.loadStory(story.id); // accessing non-rendered data from the model
+    },
+    fromtimestamp: function(timestamp){
+        return new Date(timestamp).toLocaleString();
+    }
+});
+})();
+</script>
+</polymer-element>

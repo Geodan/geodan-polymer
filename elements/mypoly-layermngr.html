@@ -1,0 +1,143 @@
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/core-drag-drop/core-drag-drop.html">
+<polymer-element name="d3-layermngr">
+  <template>
+   <style>
+   
+    core-item.layer {
+      height: 60px;
+      padding: 2px;
+      background-color: #efefef;
+      border: 1px solid #ddd;
+    }
+
+    core-item.layer .name {
+      font-size: 0.75em;
+    }
+
+    core-item.layer .address {
+      font-size: 0.75em;
+    }
+   </style>
+   <h2>Layers</h2>
+   
+   <template repeat="{{layer in layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
+       <core-item class="layer"
+            draggable="true" 
+            on-dragstart='{{dragStart}}'  
+            on-dragover="{{allowDrop}}"
+            on-dragenter="{{dragenter}}"
+            on-dragleave="{{dragleave}}"
+            on-drop='{{dragStop}}' >
+            <div flex>
+                <paper-checkbox checked="{{layer._isvisible}}" on-change={{toggle}}></paper-checkbox>
+                <span class='name'>Layer: {{layer._id}} </span><br>
+                <paper-slider value="100" id="{{layer._id}}" on-manual-change={{change}}></paper-slider>
+            </div>
+        </core-item>
+   </template>
+   
+   <paper-input required='true' id="layerid" label="ID"></paper-input><br>
+   <paper-input required='true' id="wmsurl" label="WMS_URL" value = "http://pico.ontw.geodan.nl:8080/geoserver/pico/wms?"></paper-input><br>
+   <paper-input required='true' id="layername" label="LayerName" value = "pico:hoogspanningsnetbenelux"></paper-input><br>
+   <paper-input required='true' id="layertype" label="LayerType" value = "wms"></paper-input><br>
+   <core-icon-button icon="menu" on-click={{addlayer}}></core-icon-button>
+   
+   </template>
+  <script>
+ Array.prototype.move = function (old_index, new_index) {
+    while (old_index < 0) {
+        old_index += this.length;
+    }
+    while (new_index < 0) {
+        new_index += this.length;
+    }
+    if (new_index >= this.length) {
+        var k = new_index - this.length;
+        while ((k--) + 1) {
+            this.push(undefined);
+        }
+    }
+    this.splice(new_index, 0, this.splice(old_index, 1)[0]);
+    return this; // for testing purposes
+};
+  Polymer('d3-layermngr', {
+      draglayer: null,
+      layers: [],
+      ready: function(){
+      },
+      addlayer: function(e){
+          var id = this.$.layerid.value;
+          var url = this.$.wmsurl.value;
+          var layers = this.$.layername.value;
+          var type = this.$.layertype.value;
+          var map = this.layers[0]._map;
+          var layer = new d3map.rasterlayer(id, map, {
+            type: type,
+            url: url,
+            layers: layers
+         });
+         map.addLayer(layer);
+      },
+
+      change: function(a,b,c){
+          var layer = c.templateInstance.model.layer;
+          layer.setOpacity(c.value/100);
+          if (c.value > 0){
+              layer.setVisibility(true);
+          }
+          else if (c.value == 0){
+              layer.setVisibility(false);
+          }
+      },
+      toggle: function(a,b,c){
+          var layer = c.templateInstance.model.layer;
+          if (c.checked){
+              layer.setVisibility(true);
+          }
+          else {
+              layer.setVisibility(false);
+          }
+      },
+      dragStart: function(a,b,c){
+          //a.preventDefault();
+          //a.stopPropagation();
+          this.draglayer = c.templateInstance.model.layer;
+      },
+      dragenter: function(a,b,c){
+          
+          
+      },
+      dragleave: function(a,b,c){
+          if (c.className == 'layer'){
+              c.style.borderTopColor = '#ddd';
+              c.style.borderTopWidth = '1px';
+          }
+      },
+      allowDrop: function(a,b,c){
+          a.preventDefault();
+          a.stopPropagation();
+          if (c.className == 'layer'){
+              c.style.borderTopWidth = '4px';
+              c.style.borderTopColor = 'red';
+          }
+      },
+      dragStop: function(a,b,c){
+          c.style.borderTopWidth = '1px';
+              c.style.borderTopColor = '#ddd';
+          //Make sure the draglayer is moved to a position before the droponlayer in the layer array  
+          var droponlayer = c.templateInstance.model.layer;
+          var toIndex = this.layers.indexOf(droponlayer);
+          var fromIndex = this.layers.indexOf(this.draglayer);
+          this.layers.move(fromIndex, toIndex);
+          
+          droponlayer._map.layers().forEach(function(d){
+                  d.clear();
+                  d.redraw();
+          });
+      }
+          
+  });
+  </script>
+</polymer-element>
