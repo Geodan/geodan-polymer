@@ -1,0 +1,123 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="./mypoly-mapitem.html">
+<link rel="import" href="./mypoly-drawingmenu.html">
+<script src="../lib/d3.v3.min.js"></script>
+<script src="../lib/d3.geo.tile.v0.min.js"></script>
+<script src="../lib/simplify.js"></script>
+<script src="../lib/d3map.js"></script>
+<script src="../lib/d3featuremenu.js"></script>
+<script src="../lib/d3layer.js"></script>
+<script src="../lib/d3vectorlayer.js"></script>
+<script src="../lib/d3rasterlayer.js"></script>
+<polymer-element name='d3-map' attributes='latitude longitude zoom'>
+
+ <template>
+  <style>
+  core-header-panel {
+        height: 100%;
+        overflow: auto;
+        width: 100%;
+        float: left;
+        /*-webkit-overflow-scrolling: touch;*/ 
+      }
+      core-toolbar {
+        position: relative;
+        background: #03a9f4;
+        color: white;
+      }
+      #tabs {
+        width: 100%;
+        margin: 0;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .container {
+        width: 100%;
+        margin: 50px auto;
+      }
+      @media (min-width: 481px) {
+        #tabs {
+          width: 200px;
+        }
+        .container {
+          width: 100%;
+        }
+      }
+      
+    :host {
+      display: block;
+      width: 100%;
+    }
+    
+   
+    .entity {
+       fill: none;
+       stroke: red;
+   }
+    
+  </style>
+
+ <core-header-panel>
+ 
+        <core-toolbar horizontal layout>
+            <h2>Map</h2>
+           <mypoly-drawingmenu on-draw="{{draw}}"></mypoly-drawingmenu>
+        </core-toolbar>
+        
+    <svg id="map" width = {{width}} height = {{height}}></svg>
+ </core-header-panel>
+
+
+ </template>
+ <script>
+ 
+ (function(){
+ Polymer('d3-map',{
+    width: 400,
+    height: 400,
+    features: [],
+    created: function(){
+
+    },
+    attached: function(){
+        var self = this;
+        this.width = this.clientWidth;
+        this.height = this.clientHeight; //TODO, get the proper container height
+        
+        var svg = this.$.map;
+        this.map = new d3map.map(svg,{center: [this.longitude,this.latitude],zoom: this.zoom});
+
+        this.map.redraw();
+        
+        //this.map.resize([this.clientWidth, this.clientHeight]);
+        window.addEventListener("resize",function(){
+            self.width = self.clientWidth;
+            self.height = self.clientHeight;
+            self.map.resize([self.width,self.height]);
+            self.map.redraw();
+        }); 
+    },
+    redraw: function(){
+        this.map.redraw();
+    },
+    zoomTo: function(extent){
+        console.warn('not implemented');
+    },
+    center: function(position){
+        console.warn('not implemented');
+    },
+    draw: function(d){
+        this.map.draw(d);
+    },
+    layers: function(){
+        return this.map.layers();
+    },
+    map: function(){
+        return this.map;
+    }
+ });
+ })();
+ </script>
+</polymer-element>

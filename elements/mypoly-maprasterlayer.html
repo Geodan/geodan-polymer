@@ -1,0 +1,31 @@
+<polymer-element name="d3-maprasterlayer" attributes="id type url layers">
+  <template>
+   <style>
+   
+   </style>
+  </template>
+  <script>
+  Polymer('d3-maprasterlayer', {
+     data: [],
+     attached: function(){
+         var self = this;
+         var map = this.parentNode.map;
+         this.map = map;
+         var onclick = function(d,e){
+             //Added for testing
+             //d3.event.stopPropagation();
+             //self.map.draw({feature: d});
+         }
+         
+         
+         this.layer = new d3map.rasterlayer(this.id, map, {
+            type: this.type,
+            url: this.url,
+            layers: this.layers
+         });
+         map.addLayer(this.layer);
+         map.redraw();
+     }
+  });
+  </script>
+</polymer-element>

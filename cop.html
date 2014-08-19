@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  
+    <script src="bower_components/platform/platform.js"></script>
+    
+    <script src="/sites/cow/lib/underscore/underscore-min.js"></script>
+    <script src="/sites/cow/lib/polyfill-promise/promise-0.1.1.min.js"></script>
+    <script src="/sites/cow/lib/dbjs/db.js"></script>
+    <script src="/sites/cow/dist/cow.js"></script>
+    <script type="text/javascript">
+        
+        var core = new Cow.core();
+        //add a default socketserver
+        core.socketservers({
+            _id: 'default', 
+            data: {protocol:'ws',ip:'192.168.25.230', port:8081}
+        });
+        core.socketserver('default');
+        var connection = core.connect();
+    </script>
+    <link rel="import" href="elements/my-map.html">
+    <style>
+      html,body {
+        height: 100%;
+        margin: 0;
+        background-color: #E5E5E5;
+        font-family: 'RobotoDraft', sans-serif;
+      }
+    </style>
+  </head>
+  
+  <!--<body unresolved fullbleed layout vertical>-->
+  <body unresolved>
+    <my-app></my-app>
+ </body>
+</html>

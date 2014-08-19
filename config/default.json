@@ -1,0 +1,23 @@
+{
+      "linestyles":  [
+        {"stroke": "#000"},
+        {"stroke": "#f57900"},
+        {"stroke": "#204a87"},
+        {"stroke": "#cc0000"},
+        {"stroke": "#5c3566"},
+        {"stroke": "#4e9a06"}],
+      "polygonstyles": [
+        {"stroke": "#000"   ,"fill": "#000"  },
+        {"stroke": "#f57900","fill": "#f57900"},
+        {"stroke": "#204a87","fill": "#204a87"},
+        {"stroke": "#cc0000","fill": "#cc0000"},
+        {"stroke": "#5c3566","fill": "#5c3566"},
+        {"stroke": "#4e9a06","fill": "#4e9a06"}],
+      "icontypes":[
+		{"cat":"","url":"wcms/Aanvaringslocatie16x16.png","text":"Aanvaringslocatie"},
+		{"cat":"","url":"wcms/Afdamming16x16.png","text":"Afdamming"},
+		{"cat":"","url":"wcms/Appendage16x16.png","text":"Appendage"},
+		{"cat":"","url":"wcms/AWZI16x16.png","text":"AWZI"}
+		
+	  ]
+}

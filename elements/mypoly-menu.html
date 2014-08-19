@@ -1,0 +1,22 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name='mypoly-menu' noscript>
+<template>
+    <core-menu selected="0" on-core-select="{{selectAction}}" theme="core-light-theme">
+      <core-item icon="settings" label="Users" name="0"></core-item>
+      <core-item icon="settings" label="Projects" name="1"></core-item>
+    </core-menu>
+</template>
+<script>
+Polymer('mypoly-menu', {
+  itemTapAction: function(e, detail, sender) {
+    //this.$.selection.select(e.target);
+  },
+  selectAction: function(e, id) {
+    var pages = document.querySelector('core-pages');
+    var name = id.item.attributes.name.value;
+    pages.selected = name;
+  }
+});
+</script>
+</polymer-element>
