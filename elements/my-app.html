@@ -19,7 +19,11 @@
 <link rel="import" href="../elements/mypoly-map.html">
 <link rel="import" href="../elements/mypoly-maplayer.html">
 <link rel="import" href="../elements/mypoly-maprasterlayer.html">
+<link rel="import" href="../elements/mypoly-layermngr.html">
+<link rel="import" href="../elements/mypoly-geoservermngr.html">
 <link rel="import" href="../elements/mypoly-dialog.html">
+
+<link rel="import" href="../elements/mypoly-peersforcelayout.html">
 
 <polymer-element name='my-app'>
 <template>
@@ -28,6 +32,15 @@
           height: 100%;
           float: left;
           width: 100%;
+      }
+      d3-layermngr {
+          display: block;
+          position: absolute;
+          left: 0px;
+          top: 50px;
+          height: 100%;
+          width: 200px;
+          z-index: 101;
       }
       d3-map {
           height: 100%;
@@ -110,14 +123,7 @@
       <mypoly-list id="item-list" store="items" show="all" cols="type feature beeld"></mypoly-list>
     </div>
     <div class='page'>
-    <!--
-      <leaflet-map id="item-map"  longitude="5.2" latitude="52.2" zoom="12">
-       <template repeat={{p in points}}>
-        <leaflet-circle longitude={{p.geometry.coordinates[0]}} latitude={{p.geometry.coordinates[0]}} radius="30">
-        Round
-        </leaflet-circle>
-      </leaflet-map>
-      <!-->
+      <d3-layermngr id="layermngr"></d3-layermngr>
       <d3-map id="item-map" latitude="52.2" longitude="5.2" zoom="3">
         <d3-maprasterlayer 
             id="mapbox"
@@ -127,9 +133,12 @@
         <d3-maplayer id="pathlayer"></d3-maplayer>
         <d3-maplayer id="pointlayer"></d3-maplayer>
       </d3-map>
-      <!---->
     </div>
-      
+    
+    <div class='page'>
+      <mypoly-peersforcelayout id="peersforcelayout" store="peers"></mypoly-peersforcelayout>
+    </div>
+    
     </core-pages>
   </div>
 </core-scaffold>
@@ -147,12 +156,13 @@
               {name: 'Projects', icon: 'list'},
               {name: 'Items', icon: 'list'},
               {name: 'Map', icon: 'maps:map'}
+              ,{name: 'Peers2', icon: 'list'}
             ];
             function reload_items(id){
-                
+                //Bind items to list
                 self.$['item-list'].items = core.projects(id).items();
                 
-                /* Doing the map items */
+                //Bind items to map (points and paths)
                 var data = _.filter(core.projects(id).items(), function(d){ 
                     return !d.deleted() && d.data('type') == 'feature' && d.data('feature').geometry.type != 'Point';
                 });
@@ -160,8 +170,7 @@
                 data.forEach(function(d){
                         feats.push(d.data('feature'));
                 });
-                
-                self.$['item-map'].newdata(feats,'pathlayer');
+                self.$['pathlayer'].newdata(feats);
                 var data = _.filter(core.projects(id).items(), function(d){ 
                     return !d.deleted() && d.data('type') == 'feature' && d.data('feature').geometry.type == 'Point';
                 });
@@ -171,14 +180,22 @@
                         feat.id = d.id();
                         feats.push(feat);
                 });
-                self.$['item-map'].newdata(feats,'pointlayer');
+                self.$['pointlayer'].newdata(feats);
             }
+            //Bind layers to layermngr
+            self.$['layermngr'].layers = self.$['item-map'].layers();
+            
+            //Reload items on changing project
             this.$['project-list'].addEventListener('activate-tap', function(e) {
                 var id = e.detail.id;
                 reload_items(id);
                 core.project().itemStore().on('datachange', function(d){
                     reload_items(id);
                 });
+            });
+            core.peerStore().on('datachange', function(d){
+                    var peers = _(core.peers()).filter(function(d){return !d.deleted();});
+                    self.$['peersforcelayout'].newdata(peers);
             });
         }
       });
