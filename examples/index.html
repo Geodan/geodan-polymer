@@ -1,23 +1,58 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="../bower_components/platform/platform.js"></script>
+    <link rel="import" href="../bower_components/polymer/polymer.html">
+    <link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
+    <link rel="import" href="../bower_components/core-splitter/core-splitter.html">
+    <link rel="import" href="../bower_components/core-list/core-list.html">
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../bower_components/core-collapse/core-collapse.html">
+    <link rel="import" href="../bower_components/core-selector/core-selector.html">
+    <link rel="import" href="../bower_components/core-menu/core-menu.html">
+    <link rel="import" href="../bower_components/core-pages/core-pages.html">
+    <link rel="import" href="../bower_components/core-overlay/core-overlay.html">
+    <link rel="import" href="../bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
+    <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+    <link rel="import" href="../bower_components/core-icons/maps-icons.html">
+    <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+    <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+    
     <script src="/sites/cow/lib/underscore/underscore-min.js"></script>
-    <script src="/sites/cow/lib/polyfill-promise/promise-0.1.1.min.js"></script>
-    <script src="/sites/cow/lib/dbjs/db.js"></script>
     <script src="/sites/cow/dist/cow.js"></script>
     <script type="text/javascript">
         
-    var core = new Cow.core();
-    //add a default socketserver
-    core.socketservers({
-        _id: 'default', 
-        data: {protocol:'ws',ip:'192.168.25.194', port:8081}
-    });
-    core.socketserver('default');
+    var core = new Cow.core({
+              herdname: 'test'
+        });
+        //add a default socketserver
+        core.socketservers({
+            _id: 'default', 
+            //data: {protocol:'ws',ip:'192.168.24.95', port:8081}
+            data: {protocol: 'wss', ip: 'websocket.geodan.nl', port: 443, dir: 'icms'}
+        });
+        core.socketserver('default');
     var connection = core.connect();
     </script>
+    
+    <link rel="import" href="../elements/cow-dashboard.html">
+    <style>
+        html, body {
+          height: 100%;
+          margin: 0;
+          background-color: #E5E5E5;
+          font-family: 'RobotoDraft', sans-serif;
+        }
+    </style>
+    
+    
   </head>
   
   <body>
+  <body unresolved>
+    <cow-dashboard></cow-dashboard>
+  </body>
  </body>
 </html>

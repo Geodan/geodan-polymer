@@ -54,6 +54,7 @@
     <content>
             
     </content>
+    <!-- FIXME: this makes it awfull slow....
     <div class="icons">
         <core-icon-button
           id="edit"
@@ -61,11 +62,12 @@
           on-tap="{{saveTapped}}">
         </core-icon-button>
         <core-icon-button
-          id="favicon"
+          id="delete"
           icon="delete"
-          on-tap="{{favoriteTapped}}">
+          on-tap="{{deleteTapped}}">
         </core-icon-button>
     </div>
+    -->
   </template>
   <script>
   Polymer('mypoly-item', {
@@ -86,9 +88,9 @@
           reflect: true
         }
       },
-      favoriteTapped: function(event, detail, sender) {
+      deleteTapped: function(event, detail, sender) {
         this._deleted = !this._deleted;
-        this.fire('favorite-tap');
+        this.fire('delete-tap');
       },
       saveTapped: function(event, detail, sender){
           sender.templateInstance.model.item.sync();

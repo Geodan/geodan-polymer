@@ -1,5 +1,5 @@
 #bower stuff
-bower*.*
+#bower*.*
 bower_components
 
 # Compiled source #

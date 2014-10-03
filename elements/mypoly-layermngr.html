@@ -22,7 +22,7 @@
    </style>
    <h2>Layers</h2>
    
-   <template repeat="{{layer in layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
+   <template repeat="{{layer in tmp_layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
        <core-item class="layer"
             draggable="true" 
             on-dragstart='{{dragStart}}'  
@@ -66,6 +66,12 @@
       draglayer: null,
       layers: [],
       ready: function(){
+          this.tmp_layers =[];
+          this.tmp_layers = this.layers.reverse();
+          
+      },
+      layersChanged: function(){
+            //this.tmp_layers = this.layers.reverse();
       },
       addlayer: function(e){
           var id = this.$.layerid.value;

@@ -1,0 +1,76 @@
+<script src="../lib/d3peersforcelayout.js"></script>
+<polymer-element name="mypoly-peersforcelayout" attributes="peers">
+<template>
+    <style>
+
+      
+      .container {
+        width: 100%;
+        margin: 50px auto;
+      }
+      @media (min-width: 481px) {
+        .container {
+          width: 100%;
+        }
+      }
+    :host {
+      display: block;
+      width: 100%;
+    }
+    
+    
+    .link {
+      stroke: #000;
+      stroke-width: 1.5px;
+    }
+    
+    .node {
+      fill: #000;
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+    
+    .node.a { fill: #1f77b4; }
+    .node.b { fill: #ff7f0e; }
+    .node.c { fill: #2ca02c; }
+    
+    .node text {
+        stroke: steelBlue;
+    }
+
+    </style>
+
+    <div id="forcelayout"></div>
+</template>
+
+<script>
+(function() {
+Polymer('mypoly-peersforcelayout', {
+    width: 400,
+    height: 400,
+    created: function(){
+
+    },        
+    attached: function() {
+        this.width = this.clientWidth;
+        this.height = this.clientHeight; //TODO, get the proper container height
+        var svg = this.$.forcelayout;
+        this.pfl = new Myd3.peersforcelayout(svg);
+    },
+    newdata: function(peers){
+        var mynodes = [{id:'a'}];
+        var mylinks = [];
+        for (var i =0;i < peers.length;i++){
+            var node = {id: 'a'+i, name: peers[i].username()};
+            mynodes.push(node);
+            mylinks.push({source: mynodes[0], target: node});
+        }
+        this.pfl.force.nodes(mynodes);
+        this.pfl.force.links(mylinks);
+        this.pfl.start();
+        
+    }
+});
+})();
+</script>
+</polymer-element>

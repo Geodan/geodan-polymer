@@ -1,0 +1,98 @@
+
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="mypoly-item.html">
+
+<polymer-element name="project-list">
+<template>
+    <style>
+
+      core-header-panel {
+        height: 100%;
+        overflow: auto;
+        width: 100%;
+        float: left;
+        -webkit-overflow-scrolling: touch; 
+      }
+      core-toolbar {
+        background: #03a9f4;
+        color: white;
+      }
+      #tabs {
+        width: 100%;
+        margin: 0;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .container {
+        width: 100%;
+        margin: 50px auto;
+      }
+      @media (min-width: 481px) {
+        #tabs {
+          width: 100%;
+        }
+        .container {
+          width: 100%;
+        }
+      }
+    :host {
+      display: block;
+      width: 100%;
+    }
+    mypoly-item {
+      margin-bottom: 5px;
+    }
+    </style>
+    
+    <core-selector selected="{{selected}}">
+        <template repeat="{{item,i in items}}">
+         <mypoly-item
+            item="{{item}}"
+            on-tap="{{activate}}"
+            hidden?="{{!item._deleted && show=='deleted' || item._deleted && show!=='deleted'}}" 
+            active?="{{item._id == _activeid}}"
+            >
+            <h2>{{item._data.name || item._data.ip || item._data.userid || '--'}}</h2>
+            <core-collapse opened?="{{selected == i}}" fixedSize style="height:150px">
+                <p>
+                    {{item._data.name}}<br>
+                </p>
+                <p>
+                <small>Created: {{item._created | fromtimestamp}}</small><br>
+                <small>Last update: {{item._updated | fromtimestamp}}</small>
+                </p>
+            </core-collapse>
+            
+         </mypoly-item>
+         
+       </template>
+       </core-selector>
+
+</template>
+
+<script>
+(function() {
+Polymer({
+    ready: function() {
+        var self = this;
+        this.items = [];
+        core.projectStore().loaded.then(function(){
+                self.items = _(core.projects()).filter(function(d){return d.data('name') != undefined;});
+        });
+    },
+    activate: function(d){
+        this.a = !this.a;
+        console.log('tapped', this.a);
+    },
+    fromtimestamp: function(timestamp){
+        return new Date(parseInt(timestamp)).toLocaleString();
+    },
+    stringify: function(json){
+        return JSON.stringify(json);
+    }
+});
+})();
+</script>
+</polymer-element>

@@ -1,0 +1,51 @@
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/typeahead-input/typeahead-input.html">
+
+<polymer-element name="icm-login">
+<template>
+    <style>
+    
+    </style>
+    
+    <paper-dialog opened heading="Login">
+        <typeahead-input label="Your Name" id="typeahead"></typeahead-input>
+        <template if="{{results.length > 0}}">
+          <ul>
+            <template repeat="{{result in results}}">
+              <li on-click="select">{{result}}</li>
+            </template>
+          </ul>
+        </template>
+        <br>
+        <h2>Rol:</h2>
+        <template repeat="{{roles}}">
+            <paper-icon-button label={{}} icon="perm-identity"></paper-icon-button>
+        </template>
+        <br>
+        <paper-button label="cancel" decline></paper-button>
+        <paper-button label="Login" affirmative autofocus></paper-button>
+    </paper-dialog>
+    
+</template>
+
+<script>
+(function() {
+Polymer({
+  ready: function(){
+    var self = this;
+    this.roles = ['Evacuatie', 'Populatie','Opvang','Burgemeester'];
+    this.results = [];
+    core.userStore().loaded.then(function(){
+       var users = _(core.users()).filter(function(d){return !d.deleted()});
+       self.$.typeahead.values = users.map(function(d){return d.data('name')});
+    });
+  },
+  keyup: function(e,detail,target){
+      
+  }
+});  
+})();
+</script>
+</polymer-element>
