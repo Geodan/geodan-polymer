@@ -1,0 +1,72 @@
+<polymer-element name="mypoly-peerjs" attributes="id receive send dest">
+    <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+    <template>
+    <div id="video">
+        
+    </div>
+    </template>
+	<script>
+		Polymer({
+		    
+		    rotate: function(d){
+		        if (this.connready){
+		            this.conn.send(d);
+		        }
+		    },
+		    ready: function(){
+		        var self = this;
+		        this.connready = false;
+		        var peer = new Peer(this.id, {key: 'mactftlspi8b0529'});
+		        
+		        function startreceiving(){
+		            console.log('Ready for receiving');
+		            peer.on('connection', function(conn) {
+		                console.log('Data connection open');
+                        conn.on('data', function(data){
+                            // Will print 'hi!'
+                            console.log(data);
+                          });
+                    });
+                    
+                    peer.on('call', function(call){
+                        console.log('We\'ve got a call');
+                        call.on('stream', function(remoteStream) {
+                             console.log('Receiving stream');
+                             self.$.video.src = URL.createObjectURL(stream);
+                        });
+                        call.on('error', function(err) {
+                            console.log(err);
+                        });
+                     });
+                    
+		        }
+		        
+		        function startsending(){
+		            var conn = peer.connect(self.dest);
+		            self.conn = conn;
+                    conn.on('open', function(){
+                      self.connready = true;
+                      console.log('Sending hi');
+                      conn.send('hi!');
+                    });
+		            
+		            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		            navigator.getUserMedia({video: true, audio: true}, function(stream) {
+                      var call = peer.call(self.dest, stream);
+                    }, function(err) {
+                      console.log('Failed to get local stream' ,err);
+                    });
+                    
+		        }
+		        
+		        if (this.receive){
+		            startreceiving();
+		        }
+		        if (this.send){
+		            startsending();
+		        }
+                
+		    }
+		});
+	</script>
+</polymer-element>

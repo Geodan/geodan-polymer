@@ -49,28 +49,32 @@
     }
     </style>
     
-    <post-service id="service" data="{{items}}"></post-service>
     <core-header-panel>
         <core-toolbar>
             <h2>{{store}}</h2>
             <paper-tabs id="tabs" selected="all" on-core-activate={{toggleList}} self-end>
                 <paper-tab name="all">ACTIVE</paper-tab>
-                <paper-tab name="favorites">DELETED</paper-tab>
+                <paper-tab name="deleted">DELETED</paper-tab>
+                <paper-tab name="invalids">INVALID</paper-tab>
            </paper-tabs>
         </core-toolbar>
 
         <template repeat="{{item in items}}">
+        
+        
          <mypoly-item
             item="{{item}}"
             favorite="{{item._deleted}}"
-            on-favorite-tap="{{handleFavorite}}"
+            on-delete-tap="{{handleDeleted}}"
             on-edit-tap="{{handleEdit}}"
             on-tap="{{activate}}"
-            hidden?="{{(show == 'favorites' && !item._deleted) || (show != 'favorites' && item._deleted)}}"
-            active?="{{item._id == _activeid}}">
+            hidden?="{{!item._deleted && show=='deleted' || item._deleted && show!=='deleted'}}" 
+            active?="{{item._id == _activeid}}"
+            >
             
             <h2>{{item._data.name || item._data.ip || item._data.userid || '--'}}</h2>
-            <juicy-jsoneditor json={{item._data}}></juicy-jsoneditor>
+            <p>{{item._data | stringify}}</p>
+            <!--<juicy-jsoneditor json={{item._data}}></juicy-jsoneditor>-->
             <!--
             <p>
             <template repeat="{{col in columns}}">
@@ -141,7 +145,7 @@ Polymer('mypoly-list', {
         }
         this.fire('activate-tap',{id: item._id});
     },
-    handleFavorite: function(event, detail, sender) {
+    handleDelete: function(event, detail, sender) {
         var item = sender.templateInstance.model.item;
         item._deleted = !item._deleted;
         if (this.store == 'users' ){
@@ -167,7 +171,19 @@ Polymer('mypoly-list', {
       //this.loadStory(story.id); // accessing non-rendered data from the model
     },
     fromtimestamp: function(timestamp){
-        return new Date(timestamp).toLocaleString();
+        return new Date(parseInt(timestamp)).toLocaleString();
+    },
+    stringify: function(json){
+        return JSON.stringify(json);
+    },
+    isinvalid: function(item){
+        if (!item.data('name')){
+                return true;
+        }
+        //if ((this.show == 'deleted' && !item.deleted()) || (this.show != 'deleted' && item.deleted())){
+        //    return true;
+        //}
+        return false;
     }
 });
 })();

@@ -1,0 +1,103 @@
+<polymer-element name='cow-dashboard'>
+
+<link rel="import" href="../elements/mypoly-wsstatus.html">
+<link rel="import" href="../elements/mypoly-item.html">
+<link rel="import" href="../elements/project-list.html">
+<link rel="import" href="../elements/mypoly-map.html">
+<link rel="import" href="../elements/mypoly-maplayer.html">
+<link rel="import" href="../elements/mypoly-maprasterlayer.html">
+<link rel="import" href="../elements/mypoly-layermngr.html">
+<link rel="import" href="../elements/mypoly-geoservermngr.html">
+<link rel="import" href="../elements/mypoly-dialog.html">
+
+<link rel="import" href="../elements/mypoly-peersforcelayout.html">
+
+<link rel="import" href="../elements/icm-login.html">
+
+<template>
+<style>
+
+core-header-panel {
+  height: 100%;
+}
+.page {
+        height: 100%;
+        width: 100%;
+      }
+d3-map {
+          height: 100%;
+          float: left;
+          width: 100%;
+      }
+      
+      .content {
+        position: absolute; 
+        height: 100%;
+        width: 100%;
+      }
+   
+
+</style>
+<icm-login></icm-login>
+<core-header-panel flex>
+    <core-toolbar>
+      <div>COW dashboard
+      </div>
+    </core-toolbar>
+    <div horizontal layout>
+      <div>
+        <project-list id="project-list"></project-list>
+      </div>
+      <core-splitter direction="left"></core-splitter>
+      <div class='page content'>
+        <d3-map id="item-map" latitude="52.2" longitude="5.2" zoom="3">
+            <d3-maprasterlayer 
+                id="mapbox"
+                type="tms"
+                url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
+            ></d3-rastermaplayer>
+            <d3-maplayer id="pathlayer"></d3-maplayer>
+            <d3-maplayer id="pointlayer"></d3-maplayer>
+            <d3-maplayer id="projectlayer"></d3-maplayer>
+        </d3-map>
+      </div>
+    </div>
+</core-header-panel>
+
+</template>
+<script>
+
+Polymer({
+        ready: function(){
+            var self = this;
+            this.projects = [];
+            this.core = core;
+          
+            function reload_projects(){
+                var data = _.filter(core.projects(), function(d){ 
+                    return !d.deleted() && d.data('incidentlocation');
+                });
+                var feats = [];
+                data.forEach(function(d){
+                        var loc = d.data('incidentlocation');
+                        var feat = {
+                            type: 'Feature',
+                            geometry:{
+                                type: 'Point',
+                                coordinates: [loc.lng,loc.lat]
+                            }
+                        }
+                        feat.id = d.id();
+                        feats.push(feat);
+                });
+                self.$['projectlayer'].newdata(feats);
+            }
+            
+            core.projectStore().loaded.then(function(){
+                self.projects = core.projects();
+                reload_projects();
+            });
+        }
+});
+</script>
+</polymer-element>

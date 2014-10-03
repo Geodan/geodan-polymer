@@ -129,7 +129,7 @@
             id="mapbox"
             type="tms"
             url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
-        ></d3-maplayer>
+        ></d3-maprasterlayer>
         <d3-maplayer id="pathlayer"></d3-maplayer>
         <d3-maplayer id="pointlayer"></d3-maplayer>
       </d3-map>
@@ -194,8 +194,8 @@
                 });
             });
             core.peerStore().on('datachange', function(d){
-                    var peers = _(core.peers()).filter(function(d){return !d.deleted();});
-                    self.$['peersforcelayout'].newdata(peers);
+                var peers = _(core.peers()).filter(function(d){return !d.deleted();});
+                self.$['peersforcelayout'].newdata(peers);
             });
         }
       });

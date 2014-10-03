@@ -1,0 +1,222 @@
+<polymer-element name="accel-compass-old" attributes="name value step min max">
+    <template>
+      <style>
+		@host {
+	  * {
+		display: block;
+		padding-bottom: 15px;
+		
+	  }
+	}
+        input[type='range'].mainSlider::-webkit-slider-thumb{
+            -webkit-appearance: none !important;
+            background:blue;
+            height:10px;
+            width:10px;
+        }
+        input[type='range'].mainSlider  {
+            -webkit-appearance: none !important;
+            background:orange;
+            height:10px;
+        }
+        #backdrop {
+        background: rgba(0, 0, 0, 0.25);
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        z-index: -1;
+      }
+
+      .notches
+      {
+        background:-webkit-linear-gradient(0deg, transparent 0px, transparent 10px, red 10px, red 11px, transparent 11px) 50% 50%  repeat-x;    
+        /*  background-image: url('slider_bg.png') 50% 50% repeat-x;*/
+      }
+     
+      #valueOver{
+        position:absolute;
+        text-align: center;
+        width:170px;
+		line-height:0.5em;
+		font-size:0.8em;
+      }
+      </style>
+      <div>
+        <span>{{min}}</span>
+        <input id="slider" class="mainSlider notches" type="range" min="{{ min }}" max="{{ max }}" value="{{value}}" step={{step}} />
+        <span>{{max}}</span>
+        <div id="valueOver">{{ value }}</div>
+      </div>
+     </template>
+     <script>
+      Polymer("accel-compass-old", {
+        min: -100,
+        max: 100,
+        value: 0,
+        step: 0.1,
+	  ready:function(){
+		if (window.DeviceOrientationEvent) {
+  			// Listen for the event and handle DeviceOrientationEvent object
+		  window.addEventListener('deviceorientation', devOrientHandler, false);
+		}
+	  },
+      devOrientHandler:function()
+	  {
+
+		},		
+
+      maxChanged:function(){this.value = Math.min(this.max,this.value);},
+      minChanged:function(){this.value = Math.max(this.min,this.value);},
+      valueChanged:function(){
+        this.fire('value-changed', {name: this.name,value:this.value});
+      }
+      });
+    </script>
+  </polymer-element>
+
+
+<polymer-element name="accel-compass" attributes="supported enabled rotation samples debugData" >
+	<script>
+		Polymer("accel-compass", {
+			supported: false,
+			enabled: true,
+			samples: 1, //how many samples to take/average before sending event
+			created:function()
+			{
+				this.rotation = {x:0,y:0,z:0};//roll, pitch , yaw
+				this._samplingIndex = 1;
+				this._rotationBuffer = {x:0,y:0,z:0};
+			},
+			ready:function(){
+				//window.addEventListener('beforeunload', this.beforeUnload.bind(this));//buggy in chrome
+				window.onbeforeunload = this.beforeUnload.bind(this);
+				/*if (window.DeviceMotionEvent) {
+					this.supported = true;
+			  		window.addEventListener('devicemotion', this.deviceMotionHandler.bind(this), false);
+				}*/
+				if (window.DeviceOrientationEvent) {
+					this.supported = true;
+	  				// Listen for the event and handle DeviceOrientationEvent object
+			  		window.addEventListener('deviceorientation', this.deviceOrientationHandler.bind(this), false);
+				}
+		  	},
+			deviceMotionHandler:function (eventData)
+			{
+				console.log("eventData",eventData);
+				//original from http://www.html5rocks.com/en/tutorials/device/orientation/
+				// Grab the acceleration from the results
+				this.acceleration = eventData.acceleration;
+				// Grab the acceleration including gravity from the results
+				this.accelerationGrav = eventData.accelerationIncludingGravity;
+				// Grab the rotation rate from the results
+				this.rotation = eventData.rotationRate;
+				/*var rotation = eventData.rotationRate;
+				this.roll =  rotation.x != null ?	rotation.x.toFixed(2) : 0 ;
+				this.pitch = rotation.y != null ?	rotation.y.toFixed(2) : 0 ;
+				this.yaw =   rotation.z != null ?	rotation.z.toFixed(2) : 0 ;*/
+
+				// // Grab the refresh interval from the results
+				//info = eventData.interval;
+			},
+		  	deviceOrientationHandler:function(eventData)
+		  	{
+				//console.log("orientation changed",this);
+				// gamma is the left-to-right tilt in degrees, where right is positive
+				var tiltLR = eventData.gamma;//roll
+				var roll = tiltLR != null ?  tiltLR.toFixed(2) : 0 ;
+				
+				// beta is the front-to-back tilt in degrees, where front is positive
+				var tiltFB = eventData.beta;//pitch
+				var pitch = tiltFB != null ?  tiltFB.toFixed(2) : 0 ;
+
+				// alpha is the compass direction the device is facing in degrees
+				var dir = eventData.alpha//yaw
+				var yaw = dir != null ?  dir.toFixed(2) : 0 ;
+
+				//FIXME: no rotationChanged event is raised this way ?
+				/*this.rotation.x = roll;
+				this.rotation.y = pitch;
+				this.rotation.z = yaw;*/
+				/*if (smoothOver <= 1)
+				{
+					this.rotation = {x:roll,y:pitch,z:yaw};
+				}*/
+
+				
+				var rotation = {x:parseFloat(roll),y:parseFloat(pitch),z:parseFloat(yaw)};
+				
+				if (this._samplingIndex > this.samples)
+				{
+					var index = this._samplingIndex - 1;
+					//console.log("Finished bufferring values","index",index,this._rotationBuffer);
+				
+					this.rotation = {x:this._rotationBuffer.x/index,y:this._rotationBuffer.y/index,z:this._rotationBuffer.z/index};
+					
+					this._samplingIndex=1;
+					this._rotationBuffer = {x:0,y:0,z:0};
+				}
+				else
+				{
+					//console.log("buffering values", "index",this._samplingIndex);
+					this._samplingIndex++;
+					this._rotationBuffer.x += rotation.x;
+					this._rotationBuffer.y += rotation.y;
+					this._rotationBuffer.z += rotation.z;
+				}
+				
+			},
+			beforeUnload: function(event) {
+				window.removeEventListener('deviceorientation', this.deviceOrientationHandler);
+				window.removeEventListener('devicemotion', 		this.deviceMotionHandler);
+
+      			}
+		  });
+	</script>
+</polymer-element>
+
+<!--mix: send websocket messages when orientation changes-->
+<!--
+<link rel="import" href="../web-socket/socket-io.html">
+<polymer-element name="accel-compass-websocket" extends="accel-compass" attributes="socketUrl">
+	<template>
+		<socket-io id="_webSocket" socketUrl={{socketUrl}} message="{value:{{value}}, name:{{name}}}"></socket-io> 
+	</template>
+	<script>
+		Polymer("accel-compass-websocket", {
+			rotationChanged:function()
+			{
+				//this.$._webSocket.send("message",{command:"rotation",value:this.rotation});
+				this.$._webSocket.send("rotation",this.rotation);
+			}
+		});
+	</script>
+</polymer-element>
+-->
+<!--helper more than anything-->
+<polymer-element name="accel-compass-visual" extends="accel-compass">
+	<style>
+		@host {
+	  * {
+		display: block;
+		padding-bottom: 15px;
+	  }
+	}
+	</style>
+	<template>
+		Supported<input type="checkbox" checked="{{supported}}" disabled></input>
+		enabled<input type="checkbox" checked="{{enabled}}" ></input>
+		Rotation<input type="text" value="{{'x:'+rotation.x +' y:'+ rotation.y+' z:'+ rotation.z}}" disabled></input>
+		Debug info<input type="text" value={{debugData}} disabled></input>
+		<svg width="500px" height="500px">
+		    <g transform="rotate({{rotation.z}} 100 100)">
+		    <line x1="100" y1="0" x2="100" y2="200" style="stroke: rgb(255, 0, 0); stroke-width: 4px;"></line>
+		    </g>
+		</svg>
+	</template>
+	<script>
+		Polymer("accel-compass-visual", {
+		});
+	</script>
+</polymer-element>
