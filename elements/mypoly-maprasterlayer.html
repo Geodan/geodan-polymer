@@ -18,13 +18,13 @@
          }
          
          
-         this.layer = new d3map.rasterlayer(this.id, map, {
+         this.layer = new d3map.Rasterlayer(this.id, map, {
             type: this.type,
             url: this.url,
             layers: this.layers
          });
          map.addLayer(this.layer);
-         map.redraw();
+         map.draw();
      }
   });
   </script>
