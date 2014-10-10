@@ -18,7 +18,7 @@
          }
          
          
-         this.layer = new d3map.vectorlayer(this.id, map, {
+         this.layer = new d3map.Vectorlayer(this.id, map, {
             type: 'path',
             labels: true,
             opacity: 1,
@@ -39,11 +39,11 @@
          });
          this.layer.data(this.data);
          map.addLayer(this.layer);
-         map.redraw();
+         map.draw();
      },
      newdata: function(d){
          this.layer.data(d);
-         this.parentNode.map.redraw();
+         this.parentNode.map.draw();
      }
   });
   </script>

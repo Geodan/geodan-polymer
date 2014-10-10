@@ -1,9 +1,9 @@
 <link rel="import" href="./mypoly-mapitem.html">
-<!--<link rel="import" href="./mypoly-drawingmenu.html">-->m
-<script src="../lib/d3.v3.min.js"></script>
-<script src="../lib/d3.geo.tile.v0.min.js"></script>
-<script src="../lib/simplify.js"></script>
-<script src="../lib/d3map.js"></script>
+<!--<link rel="import" href="./mypoly-drawingmenu.html">-->
+<script src="../bower_components/d3/d3.js"></script>
+<script src="../bower_components/d3-plugins/geo/tile/tile.js"></script>
+<script src="../bower_components/d3map/dist/d3map.js"></script>
+
 <polymer-element name='d3-map' attributes='latitude longitude zoom'>
 
  <template>
@@ -55,7 +55,7 @@
   </style>
 
        
-    <svg id="map" width = {{width}} height = {{height}}></svg>
+    <div id="map" width = {{width}} height = {{height}}></div>
 
  </template>
  <script>
@@ -76,18 +76,18 @@
         var svg = this.$.map;
         this.map = new d3map.map(svg,{center: [this.longitude,this.latitude],zoom: this.zoom});
 
-        this.map.redraw();
+        this.map.draw();
         
         //this.map.resize([this.clientWidth, this.clientHeight]);
         window.addEventListener("resize",function(){
             self.width = self.clientWidth;
             self.height = self.clientHeight;
             self.map.resize([self.width,self.height]);
-            self.map.redraw();
+            self.map.draw();
         }); 
     },
     redraw: function(){
-        this.map.redraw();
+        this.map.draw();
     },
     zoomTo: function(extent){
         console.warn('not implemented');
