@@ -1,7 +1,7 @@
 {
   "name": "cop",
   "version": "0.0.0",
-  "description": "COP",
+  "description": "geodan-polymer",
   "license": "MIT",
   "ignore": [
     "**/.*",
