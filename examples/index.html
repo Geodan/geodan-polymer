@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script src="../bower_components/platform/platform.js"></script>
     <link rel="import" href="../bower_components/polymer/polymer.html">
     <link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
@@ -20,6 +21,10 @@
     <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
     <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
     
+    <script src="../bower_components/d3/d3.js"></script>
+    <script src="../bower_components/d3-plugins/geo/tile/tile.js"></script>
+    <script src="../bower_components/d3map/dist/d3map.js"></script>
+    
     <script src="/sites/cow/lib/underscore/underscore-min.js"></script>
     <script src="/sites/cow/dist/cow.js"></script>
     <script type="text/javascript">
@@ -37,7 +42,7 @@
     var connection = core.connect();
     </script>
     
-    <link rel="import" href="../elements/cow-dashboard.html">
+    <link rel="import" href="cow-dashboard.html">
     
     <style>
         html, body {
