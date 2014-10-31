@@ -70,8 +70,11 @@
         this.width = this.clientWidth;
         this.height = this.clientHeight; //TODO, get the proper container height
         
-        var svg = this.$.map;
-        this.map = new d3map.map(svg,{center: [this.longitude,this.latitude],zoom: this.zoom});
+        var elem = this.$.map;
+        this.map = new d3.mappu.Map(elem,{
+            center: [this.longitude,this.latitude],
+            zoom: this.zoom}
+        );
 
         this.map.draw();
         
@@ -79,7 +82,7 @@
         window.addEventListener("resize",function(){
             self.width = self.clientWidth;
             self.height = self.clientHeight;
-            self.map.resize([self.width,self.height]);
+            //self.map.resize([self.width,self.height]);
             self.map.draw();
         }); 
     },
@@ -96,7 +99,7 @@
         this.map.draw(d);
     },
     layers: function(){
-        return this.map.layers();
+        return this.map.layers;
     },
     map: function(){
         return this.map;
