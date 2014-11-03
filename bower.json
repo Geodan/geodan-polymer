@@ -14,8 +14,8 @@
     "paper-elements": "Polymer/paper-elements#~0.4.0",
     "core-elements": "Polymer/core-elements#~0.4.0",
     "juicy-jsoneditor": "~0.0.2",
-    "d3map": "https://github.com/Geodan/d3map.git",
-    "typeahead-input": "Polymerlabs/typeahead-input#~0.3.0"
+    "typeahead-input": "Polymerlabs/typeahead-input#~0.3.0",
+    "d3.mappu": "https://github.com/tomvantilburg/d3.mappu.git"
   },
   "resolutions": {
     "polymer": "^0.4.0",

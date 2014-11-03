@@ -18,32 +18,14 @@
          }
          
          
-         this.layer = new d3map.Vectorlayer(this.id, map, {
-            type: 'path',
-            labels: true,
-            opacity: 1,
-            visible: true,
-            labelconfig: {
-                field: 'name',
-                minzoom: 171157,
-                style: {
-                    stroke: 'steelBlue'
-                }
-            },
-            style: {
-                'fill-opacity':0.5,
-                'stroke-width': 4
-            },
-            onclick: onclick,
-      
-         });
-         this.layer.data(this.data);
-         map.addLayer(this.layer);
-         map.draw();
+         this.layer = new d3.mappu.VectorLayer(this.id,{
+            reproject: false
+         }).addTo(map);
+         this.layer.data = this.data;
+         this.layer.draw();
      },
      newdata: function(d){
-         this.layer.data(d);
-         this.parentNode.map.draw();
+         this.layer.data = d;
      }
   });
   </script>
