@@ -63,15 +63,14 @@
     height: 400,
     features: [],
     created: function(){
-
+         
     },
     attached: function(){
         var self = this;
         this.width = this.clientWidth;
         this.height = this.clientHeight; //TODO, get the proper container height
         
-        var elem = this.$.map;
-        this.map = new d3.mappu.Map(elem,{
+        this.map = new d3.mappu.Map(this.$.map,{
             center: [this.longitude,this.latitude],
             zoom: this.zoom}
         );
@@ -84,7 +83,7 @@
             self.height = self.clientHeight;
             //self.map.resize([self.width,self.height]);
             self.map.draw();
-        }); 
+        });
     },
     redraw: function(){
         this.map.draw();

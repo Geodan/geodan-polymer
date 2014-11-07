@@ -18,23 +18,32 @@
 <style>
 
 core-header-panel {
-  height: 100%;
+    height: 100%;
 }
 .page {
-        height: 100%;
-        width: 100%;
-      }
+    height: 100%;
+    width: 100%;
+}
 d3-map {
-          height: 100%;
-          float: left;
-          width: 100%;
-      }
-      
-      .content {
-        position: absolute; 
-        height: 100%;
-        width: 100%;
-      }
+    height: 100%;
+    float: left;
+    width: 100%;
+}
+
+.content {
+    position: absolute; 
+    height: 100%;
+    width: 100%;
+}
+d3-layermngr {
+    display: block;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 100%;
+    width: 200px;
+    z-index: 101;
+}
    
 
 </style>
@@ -48,25 +57,32 @@ d3-map {
       <div>
         <project-list id="project-list"></project-list>
       </div>
-      <core-splitter direction="left"></core-splitter>
+      <core-splitter minSize="200px" direction="left"></core-splitter>
       <div class='page content'>
-        <d3-map id="item-map" latitude="52.2" longitude="5.2" zoom="3">
+        <d3-map id="mapelement" latitude="52.2" longitude="5.2" zoom="3">
             <d3-maprasterlayer 
                 id="mapbox"
                 type="tms"
                 url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
+            ></d3-rastermaplayer>
+            <d3-maprasterlayer 
+                id="pico1"
+                type="wms"
+                url= "/service/pico/geoserver/pico/wms?"
+                layers= 'pico:pico_sjv_sf'
             ></d3-rastermaplayer>
             <d3-maplayer id="pathlayer"></d3-maplayer>
             <d3-maplayer id="pointlayer"></d3-maplayer>
             <d3-maplayer id="projectlayer"></d3-maplayer>
         </d3-map>
       </div>
+      <d3-layermngr id="layermngr"></d3-layermngr>
     </div>
 </core-header-panel>
 
 </template>
 <script>
-
+var tmp;
 Polymer({
         ready: function(){
             var self = this;
@@ -93,10 +109,19 @@ Polymer({
                 self.$['projectlayer'].newdata(feats);
             }
             
+            
+            
             core.projectStore().loaded.then(function(){
                 self.projects = core.projects();
                 reload_projects();
             });
+            this.$['project-list'].addEventListener('activate', function(e) {
+                console.log(e.detail);
+              });
+        },
+        attached: function(){
+            tmp = this.$.mapelement.map.layers;
+            this.$.layermngr.layers = this.$.mapelement.map.layers;
         }
 });
 </script>

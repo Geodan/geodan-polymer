@@ -46,6 +46,14 @@
     }
     </style>
     
+    <core-list data="{{items}}" height="80">
+      <template>
+        <div class="{{ {selected: selected} }}">
+          {{model._id}}
+        </div>
+      </template>
+    </core-list>
+    <!--
     <core-selector selected="{{selected}}">
         <template repeat="{{item,i in items}}">
          <mypoly-item
@@ -69,7 +77,7 @@
          
        </template>
        </core-selector>
-
+       -->
 </template>
 
 <script>
@@ -84,7 +92,9 @@ Polymer({
     },
     activate: function(d){
         this.a = !this.a;
-        console.log('tapped', this.a);
+        if (this.a){
+            this.fire('activate', {id: this.id});
+        }
     },
     fromtimestamp: function(timestamp){
         return new Date(parseInt(timestamp)).toLocaleString();
