@@ -10,6 +10,7 @@
       padding: 2px;
       background-color: #efefef;
       border: 1px solid #ddd;
+      opacity: 0.8;
     }
 
     core-item.layer .name {
@@ -19,10 +20,14 @@
     core-item.layer .address {
       font-size: 0.75em;
     }
+    paper-input {
+        font-size: 10pt;
+    }
+    
    </style>
-   <h2>Layers</h2>
-   
-   <template repeat="{{layer in layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
+   <core-icon-button icon='expand-more' on-click="{{collapseLayers}}"></core-icon-button>Layers<br>
+   <core-collapse id="collapseLayers">
+   <template repeat="{{layer in map.layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
        <core-item class="layer"
             draggable="true" 
             on-dragstart='{{dragStart}}'  
@@ -37,13 +42,23 @@
             </div>
         </core-item>
    </template>
-   <!--
-   <paper-input required='true' id="layerid" label="ID"></paper-input><br>
-   <paper-input required='true' id="wmsurl" label="WMS_URL" value = "http://pico.ontw.geodan.nl:8080/geoserver/pico/wms?"></paper-input><br>
-   <paper-input required='true' id="layername" label="LayerName" value = "pico:hoogspanningsnetbenelux"></paper-input><br>
-   <paper-input required='true' id="layertype" label="LayerType" value = "wms"></paper-input><br>
-   <core-icon-button icon="menu" on-click={{addlayer}}></core-icon-button>
-   -->
+   </core-collapse>
+   <core-icon-button icon='expand-more' on-click="{{collapse}}"></core-icon-button>Add Layer
+   <core-collapse id="collapse1">
+    <div class="form">
+       <paper-input required='true' id="layername" label="Name"></paper-input><br>
+       <paper-radio-group selected="small" id="layertype">
+          <paper-radio-button name="tms" label="TMS"></paper-radio-button>
+          <paper-radio-button name="wms" label="WMS"></paper-radio-button>
+       </paper-radio-group><br>
+       <paper-input required='true' id="wmsurl" label="WMS_URL" value = "http://pico.ontw.geodan.nl:8080/geoserver/pico/wms?"></paper-input><br>
+       <paper-input required='true' id="layername" label="LayerName" value = "pico:hoogspanningsnetbenelux"></paper-input><br>
+       <!--<paper-input required='true' id="layertype" label="LayerType" value = "wms"></paper-input><br>-->
+       
+       <core-icon icon="add" on-click={{addlayer}}></core-icon>
+       </div>
+   </core-collapse>
+   
    </template>
   <script>
  Array.prototype.move = function (old_index, new_index) {
@@ -62,24 +77,32 @@
     this.splice(new_index, 0, this.splice(old_index, 1)[0]);
     return this; // for testing purposes
 };
-  Polymer('d3-layermngr', {
+  Polymer({
       draglayer: null,
-      layers: [],
+      map: {},
       ready: function(){
-          this.tmp_layers =[];
-          this.tmp_layers = this.layers;//.reverse();
+          this.map.layers = [];
+          //this.tmp_layers =[];
+          //this.tmp_layers = this.layers;//.reverse();
           
       },
       layersChanged: function(){
             //this.tmp_layers = this.layers.reverse();
+      
+      },
+      collapse: function(){
+          this.$.collapse1.toggle();
+      },
+      collapseLayers: function(){
+          this.$.collapseLayers.toggle();
       },
       addlayer: function(e){
-          var id = this.$.layerid.value;
+          var name = this.$.layername.value;
           var url = this.$.wmsurl.value;
           var layers = this.$.layername.value;
-          var type = this.$.layertype.value;
-          var map = this.layers[0]._map;
-          var layer = new d3map.rasterlayer(id, {
+          var type = this.$.layertype.value || 'wms';
+          var map = this.map;
+          var layer = new d3.mappu.RasterLayer(name, {
             ogc_type: type,
             url: url,
             layers: layers
@@ -134,14 +157,10 @@
               c.style.borderTopColor = '#ddd';
           //Make sure the draglayer is moved to a position before the droponlayer in the layer array  
           var droponlayer = c.templateInstance.model.layer;
-          var toIndex = this.layers.indexOf(droponlayer);
-          var fromIndex = this.layers.indexOf(this.draglayer);
-          this.layers.move(fromIndex, toIndex);
-          
-          droponlayer._map.layers().forEach(function(d){
-                  d.clear();
-                  d.redraw();
-          });
+          var toIndex = this.map.layers.indexOf(droponlayer);
+          var fromIndex = this.map.layers.indexOf(this.draglayer);
+          this.map.layers.move(fromIndex, toIndex);
+          this.map.draw();
       }
           
   });
