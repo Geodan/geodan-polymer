@@ -72,16 +72,19 @@
         
         this.map = new d3.mappu.Map(this.$.map,{
             center: [this.longitude,this.latitude],
-            zoom: this.zoom}
+            zoom: this.zoom
+            }
         );
 
         this.map.draw();
         
-        //this.map.resize([this.clientWidth, this.clientHeight]);
+        this.map.size = [this.height,this.width];
+        this.map.draw();
+        
         window.addEventListener("resize",function(){
             self.width = self.clientWidth;
             self.height = self.clientHeight;
-            //self.map.resize([self.width,self.height]);
+            self.map.size = [self.height,self.width];
             self.map.draw();
         });
     },

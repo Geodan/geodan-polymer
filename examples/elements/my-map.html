@@ -1,0 +1,62 @@
+<polymer-element name='my-map'>
+<template>
+    <style>
+      d3-layermngr {
+          display: block;
+          position: absolute;
+          left: 0px;
+          top: 50px;
+          height: 100%;
+          width: 200px;
+          z-index: 101;
+      }
+      d3-geoservermngr {
+          display: block;
+          position: absolute;
+          right: 0px;
+          top: 50px;
+          height: 100%;
+          width: 200px;
+          z-index: 101;
+      }
+      d3-map {
+          display: block;
+          position: absolute;
+          height: 100%;
+          float: left;
+          width: 100%;
+      }
+      
+    </style>
+
+    <d3-layermngr id="layermngr"></d3-layermngr>
+    <d3-map id="mapelement" latitude="52.2" longitude="5.2" zoom="3">
+            <d3-maprasterlayer 
+                id="mapbox"
+                type="tms"
+                url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
+            ></d3-rastermaplayer>
+            <d3-maprasterlayer 
+                id="pico1"
+                type="wms"
+                url= "/service/pico/geoserver/pico/wms?"
+                layers= 'pico:pico_sjv_sf'
+            ></d3-rastermaplayer>
+        </d3-map>
+    
+</template>
+
+<script>
+(function(){
+      Polymer({
+        ready: function(){
+           
+        },
+        attached: function(){
+            tmp = this.$.mapelement.map.layers;
+            this.$.layermngr.map = this.$.mapelement.map;
+        }
+      });
+})();
+</script>
+</polymer-element>
