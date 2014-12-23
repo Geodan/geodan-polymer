@@ -1,11 +1,11 @@
-<polymer-element name="d3-maplayer" attributes="id">
+<polymer-element name="d3-maplayer" attributes="name">
   <template>
    <style>
    
    </style>
   </template>
   <script>
-  Polymer('d3-maplayer', {
+  Polymer({
      data: [],
      attached: function(){
          var self = this;
@@ -18,7 +18,7 @@
          }
          
          
-         this.layer = new d3.mappu.VectorLayer(this.id,{
+         this.layer = new d3.mappu.VectorLayer(this.name,{
             reproject: false
          }).addTo(map);
          this.layer.data = this.data;

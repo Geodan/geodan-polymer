@@ -27,7 +27,7 @@
    </style>
    <core-icon-button icon='expand-more' on-click="{{collapseLayers}}"></core-icon-button>Layers<br>
    <core-collapse id="collapseLayers">
-   <template repeat="{{layer in map.layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
+   <template repeat="{{layer in layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
        <core-item class="layer"
             draggable="true" 
             on-dragstart='{{dragStart}}'  
@@ -37,7 +37,7 @@
             on-drop='{{dragStop}}' >
             <div flex>
                 <paper-checkbox checked="{{layer.visible}}" on-change={{toggle}}></paper-checkbox>
-                <span class='name'>Layer: {{layer.name}} </span><br>
+                <span class='name'>{{layer.name}} </span><br>
                 <paper-slider value="100" id="{{layer.id}}" on-change={{change}}></paper-slider>
             </div>
         </core-item>
@@ -82,6 +82,7 @@
       map: {},
       ready: function(){
           this.map.layers = [];
+          this.layers = [];
           //this.tmp_layers =[];
           //this.tmp_layers = this.layers;//.reverse();
           
@@ -160,7 +161,7 @@
           var toIndex = this.map.layers.indexOf(droponlayer);
           var fromIndex = this.map.layers.indexOf(this.draglayer);
           this.map.layers.move(fromIndex, toIndex);
-          this.map.draw();
+          this.map.redraw();
       }
           
   });

@@ -88,13 +88,22 @@
         });
     },
     redraw: function(){
-        this.map.draw();
+        this.map.redraw();
+    },
+    zoom: function(val){
+        this.map.zoom = val;
     },
     zoomTo: function(extent){
         console.warn('not implemented');
     },
     center: function(position){
-        console.warn('not implemented');
+    	if (position[0] >= -180 && position[0] <= 180 
+    			&& position[1] >= -90 && position[1] <= 90){
+    		this.map.center = position;
+    	}
+    	else {
+    		console.warn('Wrong coordinates: ',position);
+    	}
     },
     draw: function(d){
         this.map.redraw(d);

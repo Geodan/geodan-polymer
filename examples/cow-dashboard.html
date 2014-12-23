@@ -9,6 +9,7 @@
 <link rel="import" href="../elements/mypoly-layermngr.html">
 <link rel="import" href="../elements/mypoly-geoservermngr.html">
 <link rel="import" href="../elements/mypoly-dialog.html">
+<link rel="import" href="../elements/geodan-suggest.html">
 <!--
 <link rel="import" href="../elements/mypoly-peersforcelayout.html">
 -->
@@ -50,8 +51,9 @@ d3-layermngr {
 <icm-login></icm-login>
 <core-header-panel flex>
     <core-toolbar>
-      <div>COW dashboard
-      </div>
+      <div>COW dashboard</div>
+      <core-icon icon="search"></core-icon>
+      <geodan-suggest id="suggest"></geodan-suggest>
     </core-toolbar>
     <div horizontal layout>
       <div>
@@ -65,15 +67,17 @@ d3-layermngr {
                 type="tms"
                 url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
             ></d3-rastermaplayer>
+            <!--
             <d3-maprasterlayer 
                 id="pico1"
                 type="wms"
                 url= "/service/pico/geoserver/pico/wms?"
                 layers= 'pico:pico_sjv_sf'
             ></d3-rastermaplayer>
-            <d3-maplayer id="pathlayer"></d3-maplayer>
-            <d3-maplayer id="pointlayer"></d3-maplayer>
-            <d3-maplayer id="projectlayer"></d3-maplayer>
+            -->
+            <d3-maplayer name="pathlayer"></d3-maplayer>
+            <d3-maplayer name="pointlayer"></d3-maplayer>
+            <d3-maplayer name="projectlayer"></d3-maplayer>
         </d3-map>
       </div>
       <d3-layermngr id="layermngr"></d3-layermngr>
@@ -118,9 +122,16 @@ Polymer({
             this.$['project-list'].addEventListener('activate', function(e) {
                 console.log(e.detail);
               });
+            tmp = self.$.mapelement;
+			this.$.suggest.addEventListener('location', function(d){
+				self.$.mapelement.center(d.detail.msg);
+				self.$.mapelement.zoom(24);
+				self.$.pointlayer.newdata([{type: 'Feature', geometry: {coordinates: d.detail.msg, type: 'Point'}}]);
+				//self.$.mapelement.center([parseFloat(coords[0]), parseFloat(coords[1])]);
+			});
         },
         attached: function(){
-            tmp = this.$.mapelement.map.layers;
+        	tmp = this.$.mapelement.map;
             this.$.layermngr.layers = this.$.mapelement.map.layers;
         }
 });

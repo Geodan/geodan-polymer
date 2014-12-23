@@ -9,7 +9,7 @@
 	 width: 400px;
 	 height: 500px;
 	 position: absolute;
-     	 
+     z-index: 10; 
  }
  .selected {
 	 color: red;
@@ -70,7 +70,6 @@
      	 	 var self = this;
      	 	 window.setTimeout(function(){ //FIXME: WHY?!
      	 	 	var value = self.$.geosuggest.value;
-     	 	 	console.log(value);
      	 	 	self.$.suggest.params = '{"q":"'+value+'"}';
      	 	 },100);
 		 }
@@ -82,7 +81,6 @@
      	 var self = this;
      	 window.setTimeout(function(){ //FIXME: this is ofcourse not the right way
      	 		 self.$.suggestlist.selectItem(self.iselected); 
-     	 		 tmp = self.$.suggestlist;
      	 },100);
      },
      lookup: function(a,b,c){
@@ -94,7 +92,9 @@
      },
      handleLookupResponse: function(e){
      	 var point = e.detail.response.response.docs[0] ? e.detail.response.response.docs[0].centroid[0] : "";
-     	 this.fire('location', {msg: point});
+     	 var location = point.replace('POINT(', '').replace(')','');
+		 var coords = location.split(' ');
+     	 this.fire('location', {msg: coords});
      }
   });
   
