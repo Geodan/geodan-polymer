@@ -6,16 +6,18 @@
        float: left;
    }
    core-list {
-     	 width: 400px;
-     	 height: 500px;
-     }
-     .selected {
-     	 color: red;
-     }
+	 width: 400px;
+	 height: 500px;
+	 position: absolute;
+     	 
+ }
+ .selected {
+	 color: red;
+	 
+ }
    
    </style>
    <input size=40 id="geosuggest" on-keydown="{{suggest}}">
-   <div id="coords"></div>
    	<core-list id="suggestlist" data="{{suggestions}}">
 	  <template>
 		<div class="row {{ {selected: selected} | tokenList }}" on-click="{{lookup}}" value="{{model.id}}" name="{{model.displayname}}">
@@ -31,7 +33,7 @@
     url="/service/geosearch/suggest"
     params='{"q":""}'
     handleAs="json"
-    on-core-response="{{handleResponse}}"></core-ajax>
+    on-core-response="{{handleSuggestResponse}}"></core-ajax>
    </div>
    <core-ajax
     id='lookup' 
@@ -43,18 +45,11 @@
    </div>
    </template>
   <script>
-
   Polymer({
      iselected: 0,
   	 suggestions: [],
      ready: function(){
         
-     },
-     handleResponse: function(e){
-     	 this.suggestions = e.detail.response.response.docs;
-     	 this.iselected = 0;
-     	 this.$.suggestlist.selectItem(this.iselected);
-     	 console.log(this.$.suggestlist.selection);
      },
      suggest: function(e){
      	 if (e.keyCode == 13){ //enter
@@ -72,9 +67,23 @@
      	 	 this.$.suggestlist.selectItem(this.iselected);
      	 }
      	 else {
-			 var value = this.$.geosuggest.value;
-			 this.$.suggest.params = '{"q":"'+value+'"}';
+     	 	 var self = this;
+     	 	 window.setTimeout(function(){ //FIXME: WHY?!
+     	 	 	var value = self.$.geosuggest.value;
+     	 	 	console.log(value);
+     	 	 	self.$.suggest.params = '{"q":"'+value+'"}';
+     	 	 },100);
 		 }
+     },
+     handleSuggestResponse: function(e){
+     	 this.$.suggestlist.clearSelection();
+     	 this.suggestions = e.detail.response.response.docs;
+     	 this.iselected = 0;
+     	 var self = this;
+     	 window.setTimeout(function(){ //FIXME: this is ofcourse not the right way
+     	 		 self.$.suggestlist.selectItem(self.iselected); 
+     	 		 tmp = self.$.suggestlist;
+     	 },100);
      },
      lookup: function(a,b,c){
      	 var id = c.getAttribute('value');
@@ -85,7 +94,6 @@
      },
      handleLookupResponse: function(e){
      	 var point = e.detail.response.response.docs[0] ? e.detail.response.response.docs[0].centroid[0] : "";
-     	 this.$.coords.innerHTML = point;
      	 this.fire('location', {msg: point});
      }
   });

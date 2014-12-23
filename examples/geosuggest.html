@@ -19,10 +19,16 @@
     
   </head>
   
-  <body>
   <body unresolved>
   <h2>GeoSuggest</h2>
-    <geodan-suggest></geodan-suggest>
-  </body>
+    <geodan-suggest id="suggest"></geodan-suggest>
+    <div id="coords"></div>
+    <script>
+    var suggestbox = document.getElementById('suggest');
+    var coordbox = document.getElementById('coords');
+    suggestbox.addEventListener('location', function(d){
+    	coordbox.innerHTML = d.detail.msg;
+    });
+    </script>
  </body>
 </html>
