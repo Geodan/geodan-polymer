@@ -76,16 +76,15 @@
             }
         );
 
-        this.map.draw();
         
         this.map.size = [this.height,this.width];
-        this.map.draw();
+        this.map.redraw();
         
         window.addEventListener("resize",function(){
             self.width = self.clientWidth;
             self.height = self.clientHeight;
             self.map.size = [self.height,self.width];
-            self.map.draw();
+            self.map.redraw();
         });
     },
     redraw: function(){
@@ -98,7 +97,7 @@
         console.warn('not implemented');
     },
     draw: function(d){
-        this.map.draw(d);
+        this.map.redraw(d);
     },
     layers: function(){
         return this.map.layers;
