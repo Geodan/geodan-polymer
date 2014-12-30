@@ -1,0 +1,55 @@
+<polymer-element name="d3-twitterlayer" attributes="name">
+  <template>
+   <style>
+   
+   </style>
+  </template>
+  <script>
+  Polymer({
+     data: [],
+     attached: function(){
+         var self = this;
+         var time = new Date();
+         var freq = 2000;
+         var map = this.parentNode.map;
+         this.map = map;
+         var onclick = function(d,e){
+             //Added for testing
+             //d3.event.stopPropagation();
+             //self.map.draw({feature: d});
+         }
+         var tweetCatchPosition = {lng:-10.5,lat:-10.5}; //Not 0,0 that gives us the unreferenced data from twitter
+         
+         this.layer = new d3.mappu.VectorLayer(this.name,{
+            reproject: true
+         }).addTo(map);
+         this.layer.data = this.data;
+         this.layer.draw();
+         
+         function tweetdataCallback(json){
+			//Don't use geoserver ID
+			json.features.forEach(function(d){
+				d.id = d.properties.id;
+			});
+			self.newdata(json.features);
+		}
+        function gettweets(t){
+			var timestmp = parseInt(t.getTime()/1000);
+			var interval = 5;
+			var x = tweetCatchPosition.lng;
+			var y = tweetCatchPosition.lat;
+			var datasource_tweets = "http://research.geodan.nl/service/osgis_geoserver/tweets/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=tweets:recent_tweets_within&maxFeatures=50&outputFormat=json&viewparams=timestmp:" + timestmp+";interval:"+interval+";x:"+x+";y:"+y;
+			d3.json(datasource_tweets,tweetdataCallback);
+		}
+		gettweets(time);
+        tweetinterval = setInterval(function(){
+			gettweets(new Date());
+		},freq); 
+         
+     },
+     newdata: function(d){
+         this.layer.data = d;
+     }
+  });
+  </script>
+</polymer-element>

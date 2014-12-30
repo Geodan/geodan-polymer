@@ -6,10 +6,10 @@
 <polymer-element name="icm-login">
 <template>
     <style>
-    
+
     </style>
     
-    <paper-dialog opened heading="Login">
+    <paper-dialog id = 'dialog' opened autoCloseDisabled heading="Login">
         <typeahead-input label="Your Name" id="typeahead"></typeahead-input>
         <template if="{{results.length > 0}}">
           <ul>
@@ -24,8 +24,8 @@
             <paper-icon-button label={{}} icon="perm-identity"></paper-icon-button>
         </template>
         <br>
-        <paper-button label="cancel" decline></paper-button>
-        <paper-button label="Login" affirmative autofocus></paper-button>
+        <paper-button label="cancel" decline>Cancel</paper-button>
+        <paper-button label="Login" affirmative autofocus on-tap="{{start}}">Login</paper-button>
     </paper-dialog>
     
 </template>
@@ -33,18 +33,26 @@
 <script>
 (function() {
 Polymer({
-  ready: function(){
-    var self = this;
-    this.roles = ['Evacuatie', 'Populatie','Opvang','Burgemeester'];
-    this.results = [];
-    core.userStore().loaded.then(function(){
-       var users = _(core.users()).filter(function(d){return !d.deleted()});
-       self.$.typeahead.values = users.map(function(d){return d.data('name')});
-    });
-  },
-  keyup: function(e,detail,target){
-      
-  }
+	created: function(){
+		this.roles = ['Evacuatie', 'Populatie','Opvang','Burgemeester'];
+		this.results = [];
+	},
+	ready: function(){
+		var self = this;
+		core.userStore().loaded.then(function(){
+		   var users = core.users().filter(function(d){return !d.deleted()});
+		   self.$.typeahead.values = users.map(function(d){return d.data('name')});
+		});
+	},
+	keyup: function(e,detail,target){
+		  
+	},
+	open: function(){
+		this.$.dialog.open();
+	},
+	start: function(){
+		this.$.dialog.close();
+	}
 });  
 })();
 </script>

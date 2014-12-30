@@ -51,8 +51,8 @@
           <paper-radio-button name="tms" label="TMS"></paper-radio-button>
           <paper-radio-button name="wms" label="WMS"></paper-radio-button>
        </paper-radio-group><br>
-       <paper-input required='true' id="wmsurl" label="WMS_URL" value = "http://pico.ontw.geodan.nl:8080/geoserver/pico/wms?"></paper-input><br>
-       <paper-input required='true' id="layername" label="LayerName" value = "pico:hoogspanningsnetbenelux"></paper-input><br>
+       <paper-input required='true' id="wmsurl" label="WMS_URL" value = "http://geodata.nationaalgeoregister.nl/kadastralekaart/wms?"></paper-input><br>
+       <paper-input required='true' id="layername" label="LayerName" value = "grens"></paper-input><br>
        <!--<paper-input required='true' id="layertype" label="LayerType" value = "wms"></paper-input><br>-->
        
        <core-icon icon="add" on-click={{addlayer}}></core-icon>
@@ -79,10 +79,11 @@
 };
   Polymer({
       draglayer: null,
-      map: {},
+      created: function(){
+      	  this.map = {};
+      	  this.layers = [];
+      },
       ready: function(){
-          this.map.layers = [];
-          this.layers = [];
           //this.tmp_layers =[];
           //this.tmp_layers = this.layers;//.reverse();
           

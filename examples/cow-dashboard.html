@@ -5,6 +5,8 @@
 <link rel="import" href="../elements/project-list.html">
 <link rel="import" href="../elements/mypoly-map.html">
 <link rel="import" href="../elements/mypoly-maplayer.html">
+<link rel="import" href="../elements/mypoly-trainlayer.html">
+<link rel="import" href="../elements/mypoly-twitterlayer.html">
 <link rel="import" href="../elements/mypoly-maprasterlayer.html">
 <link rel="import" href="../elements/mypoly-layermngr.html">
 <link rel="import" href="../elements/mypoly-geoservermngr.html">
@@ -45,15 +47,19 @@ d3-layermngr {
     width: 200px;
     z-index: 101;
 }
-   
+
+project-list {
+	height: 100%;
+}
 
 </style>
-<icm-login></icm-login>
+<icm-login id="login"></icm-login>
 <core-header-panel flex>
     <core-toolbar>
       <div>COW dashboard</div>
       <core-icon icon="search"></core-icon>
       <geodan-suggest id="suggest"></geodan-suggest>
+      <core-icon icon="menu" on-tap="{{settings}}"></core-icon>
     </core-toolbar>
     <div horizontal layout>
       <div>
@@ -75,9 +81,13 @@ d3-layermngr {
                 layers= 'pico:pico_sjv_sf'
             ></d3-rastermaplayer>
             -->
-            <d3-maplayer name="pathlayer"></d3-maplayer>
-            <d3-maplayer name="pointlayer"></d3-maplayer>
-            <d3-maplayer name="projectlayer"></d3-maplayer>
+            <d3-maplayer id="pathlayer" name="Lines"></d3-maplayer>
+            <d3-maplayer id="pointlayer" name="Points"></d3-maplayer>
+            <d3-maplayer id="projectlayer" name="Projects"></d3-maplayer>
+            <!--
+            <d3-trainlayer id="trainlayer" name="Trains"></d3-trainlayer>
+            <d3-twitterlayer id="twitterlayer" name="Tweets"></d3-twitterlayer>
+            -->
         </d3-map>
       </div>
       <d3-layermngr id="layermngr"></d3-layermngr>
@@ -113,26 +123,37 @@ Polymer({
                 self.$['projectlayer'].newdata(feats);
             }
             
-            
-            
             core.projectStore().loaded.then(function(){
                 self.projects = core.projects();
                 reload_projects();
             });
+            //A project is selected
             this.$['project-list'].addEventListener('activate', function(e) {
-                console.log(e.detail);
+                core.project(e.detail.id);
+                var items = core.project().items().filter(function(d){return !d.deleted() && d.data('type') && d.data('type') == 'feature';});
+                var feats = [];
+                items.forEach(function(d){
+                		feats.push(d.data('feature'));
+                });
+                self.$.pathlayer.newdata(feats);
+                if (core.project().data('incidentLocation')){
+                	var loc = core.project().data('incidentLocation');
+                	self.$.mapelement.center([loc.lng,loc.lat]);
+                	self.$.mapelement.zoom(24);
+                }
               });
-            tmp = self.$.mapelement;
 			this.$.suggest.addEventListener('location', function(d){
 				self.$.mapelement.center(d.detail.msg);
 				self.$.mapelement.zoom(24);
-				self.$.pointlayer.newdata([{type: 'Feature', geometry: {coordinates: d.detail.msg, type: 'Point'}}]);
-				//self.$.mapelement.center([parseFloat(coords[0]), parseFloat(coords[1])]);
+				self.$.pointlayer.newdata([{type: 'Feature', style: {stroke: 'blue', fill: 'blue'},geometry: {coordinates: d.detail.msg, type: 'Point'}}]);
 			});
         },
         attached: function(){
-        	tmp = this.$.mapelement.map;
             this.$.layermngr.layers = this.$.mapelement.map.layers;
+            this.$.layermngr.map = this.$.mapelement.map;
+        },
+        settings: function(){
+        	this.$.login.open();
         }
 });
 </script>

@@ -1,0 +1,94 @@
+<polymer-element name="d3-trainlayer" attributes="name">
+  <template>
+   <style>
+   
+   </style>
+  </template>
+  <script>
+  Polymer({
+     data: [],
+     attached: function(){
+         var self = this;
+         var map = this.parentNode.map;
+         var time = new Date();
+		 var freq = 2000;
+		 var firsttime = true;
+		 var treininterval;
+         this.map = map;
+         var onclick = function(d,e){
+             //Added for testing
+             //d3.event.stopPropagation();
+             //self.map.draw({feature: d});
+         }
+         
+         
+         this.layer = new d3.mappu.VectorLayer(this.name,{
+            reproject: true
+         }).addTo(map);
+         this.layer.data = this.data;
+         this.layer.draw();
+         
+         
+         /* Prepare treindata as a geoJSON collection */
+		function treindataCallback(json){
+			var collection = {"type":"FeatureCollection","features":[]};
+			json.forEach(function(d){
+				if (d.Trackee.match(/OBIS/g) || d.Trackee >= 4011)
+					var color =  "#000099";
+				else if (d.Trackee.match(/OBU/g) || d.Trackee < 4011)
+					var color = "#ffff00";
+				else
+					var color = "#cccccc";
+				var newlocation = {
+					type: "Feature",
+					style: {
+						fill: color,
+						stroke: color
+					},
+					id: d.Trackee,
+					properties: {
+						id: d.Trackee, 
+						organisation: d.Organisation, 
+						speed: d.Speed, 
+						track: d.Track, 
+						bps: d.Bps,
+						dop: d.Dop
+					},
+					geometry: {
+							type: "Point",
+							coordinates: [
+								d.Longitude,
+								d.Latitude
+								]
+					},
+					crs: {
+						type: "name",
+						properties: {
+							name: "urn:ogc:def:crs:OGC:1.3:CRS84"
+						}
+					}
+						
+				};
+				collection.features.push(newlocation);
+			});
+			self.newdata(collection.features);
+		}
+		function gettreinen(t){
+			var timestring = t.toISOString();
+			var tok = 'ns:prima14';//NSadmin 20intercity13
+			var datasource_treinen = "http://research.geodan.nl/service/treinen/location/api/positions?username=ns&timestamp="+timestring;
+			d3.json(datasource_treinen,treindataCallback);
+		}
+		gettreinen(time);
+		treininterval = setInterval(function(){
+			time = new Date();
+			gettreinen(time);
+		},freq);
+         
+     },
+     newdata: function(d){
+         this.layer.data = d;
+     }
+  });
+  </script>
+</polymer-element>

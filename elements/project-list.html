@@ -17,6 +17,9 @@
         background: #03a9f4;
         color: white;
       }
+      core-list {
+      	  height: 400px;
+      }
       #tabs {
         width: 100%;
         margin: 0;
@@ -47,10 +50,10 @@
     
     </style>
     
-    <core-list data="{{items}}">
+    <core-list id="projectlist" data="{{items}}">
       <template>
-        <div class="{{ {selected: selected} }}">
-          {{model._id}}
+        <div on-tap="{{activate}}" value="{{model._id}}" class="{{ {selected: selected} }}">
+          {{model._data.name}}
         </div>
       </template>
     </core-list>
@@ -84,18 +87,18 @@
 <script>
 (function() {
 Polymer({
+	created: function(){
+		this.items = [];
+	},
     ready: function() {
         var self = this;
-        this.items = [];
         core.projectStore().loaded.then(function(){
-                self.items = _(core.projects()).filter(function(d){return d.data('name') != undefined;});
+                self.items = core.projects().filter(function(d){return d.data('name') != undefined;});
         });
     },
-    activate: function(d){
-        this.a = !this.a;
-        if (this.a){
-            this.fire('activate', {id: this.id});
-        }
+    activate: function(a,b,c){
+    	var id = c.getAttribute('value');
+    	this.fire('activate', {id: id});
     },
     fromtimestamp: function(timestamp){
         return new Date(parseInt(timestamp)).toLocaleString();
