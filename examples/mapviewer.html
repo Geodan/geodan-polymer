@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="../bower_components/platform/platform.js"></script>
+    <script src="../bower_components/webcomponentsjs/webcomponents.js"></script>
     <link rel="import" href="../bower_components/polymer/polymer.html">
     <link rel="import" href="../bower_components/core-list/core-list.html">
     <link rel="import" href="../bower_components/core-item/core-item.html">
@@ -24,16 +24,7 @@
     <link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
     
     
-    <script src="../bower_components/d3/d3.js"></script>
-    <script src="../bower_components/d3-plugins/geo/tile/tile.js"></script>
-    <script src="../bower_components/d3.mappu/dist/d3.mappu.js"></script>
     
-    <link rel="import" href="../elements/mypoly-map.html">
-    <link rel="import" href="../elements/mypoly-maplayer.html">
-    <link rel="import" href="../elements/mypoly-maprasterlayer.html">
-    <link rel="import" href="../elements/mypoly-layermngr.html">
-    <link rel="import" href="../elements/mypoly-geoservermngr.html">
-    <link rel="import" href="./elements/my-map.html">
     
     <style>
         html, body {
@@ -47,9 +38,21 @@
     
   </head>
   
-  <body>
+ 
   <body unresolved>
     <my-map></my-map>
   </body>
- </body>
+  <script src="../bower_components/d3/d3.js"></script>
+    <script src="../bower_components/d3-plugins/geo/tile/tile.js"></script>
+    <script src="../bower_components/d3.mappu/src/d3.dev/d3.geo.raster.js"></script>
+    <script src="../bower_components/d3.mappu/src/d3.dev/d3.quadtiles.js"></script>
+    <script src="../bower_components/d3.mappu/dist/d3.mappu.js"></script>
+    
+    <link rel="import" href="../elements/mypoly-map.html">
+    <link rel="import" href="../elements/mypoly-maplayer.html">
+    <link rel="import" href="../elements/mypoly-maprasterlayer.html">
+    <link rel="import" href="../elements/mypoly-layermngr.html">
+    <link rel="import" href="../elements/mypoly-geoservermngr.html">
+    <link rel="import" href="./elements/my-map.html">
+ 
 </html>

@@ -1,12 +1,15 @@
-<polymer-element name="d3-maprasterlayer" attributes="id type url layers">
+<polymer-element name="d3-maprasterlayer" attributes="name type url layers visible">
   <template>
    <style>
    
    </style>
   </template>
   <script>
-  Polymer('d3-maprasterlayer', {
-     data: [],
+  Polymer({
+  	 visible: true,
+  	 created: function(){
+  	 	 this.data = [];
+  	 },
      attached: function(){
          var self = this;
          var map = this.parentNode.map;
@@ -21,7 +24,8 @@
          this.layer = new d3.mappu.RasterLayer(this.id,  {
             ogc_type: this.type,
             url: this.url,
-            layers: this.layers
+            layers: this.layers,
+            visible: this.visible
          }).addTo(map);
          this.layer.draw();
      }

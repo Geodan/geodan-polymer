@@ -61,9 +61,8 @@
  Polymer({
     width: 400,
     height: 400,
-    features: [],
     created: function(){
-         
+         this.features = [];
     },
     attached: function(){
         var self = this;
@@ -76,29 +75,37 @@
             }
         );
 
-        this.map.draw();
         
         this.map.size = [this.height,this.width];
-        this.map.draw();
+        this.map.redraw();
         
         window.addEventListener("resize",function(){
             self.width = self.clientWidth;
             self.height = self.clientHeight;
             self.map.size = [self.height,self.width];
-            self.map.draw();
+            self.map.redraw();
         });
     },
     redraw: function(){
-        this.map.draw();
+        this.map.redraw();
+    },
+    zoom: function(val){
+        this.map.zoom = val;
     },
     zoomTo: function(extent){
         console.warn('not implemented');
     },
     center: function(position){
-        console.warn('not implemented');
+    	if (position[0] >= -180 && position[0] <= 180 
+    			&& position[1] >= -90 && position[1] <= 90){
+    		this.map.center = position;
+    	}
+    	else {
+    		console.warn('Wrong coordinates: ',position);
+    	}
     },
     draw: function(d){
-        this.map.draw(d);
+        this.map.redraw(d);
     },
     layers: function(){
         return this.map.layers;
