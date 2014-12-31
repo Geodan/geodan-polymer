@@ -16,6 +16,7 @@
 <link rel="import" href="../elements/mypoly-peersforcelayout.html">
 -->
 <link rel="import" href="../elements/icm-login.html">
+<link rel="import" href="../elements/icm-projectmenu.html">
 
 <template>
 <style>
@@ -54,18 +55,22 @@ project-list {
 
 </style>
 <icm-login id="login"></icm-login>
+<icm-projects id="projectmenu"></icm-projects>
 <core-header-panel flex>
     <core-toolbar>
       <div>COW dashboard</div>
       <core-icon icon="search"></core-icon>
       <geodan-suggest id="suggest"></geodan-suggest>
-      <core-icon icon="menu" on-tap="{{settings}}"></core-icon>
+      <paper-button raised on-tap="{{settings}}">Login</paper-button>
+      <paper-button raised on-tap="{{projectmenu}}">Project</paper-button>
     </core-toolbar>
     <div horizontal layout>
+
       <div>
         <project-list id="project-list"></project-list>
       </div>
       <core-splitter minSize="200px" direction="left"></core-splitter>
+
       <div class='page content'>
         <d3-map id="mapelement" latitude="52.2" longitude="5.2" zoom="3">
             <d3-maprasterlayer 
@@ -73,6 +78,13 @@ project-list {
                 type="tms"
                 url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
             ></d3-rastermaplayer>
+            <d3-maprasterlayer 
+                id="mapbox-dark"
+                type="tms"
+                visible="false"
+                url="http://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png"
+            ></d3-rastermaplayer>
+            
             <!--
             <d3-maprasterlayer 
                 id="pico1"
@@ -85,7 +97,7 @@ project-list {
             <d3-maplayer id="pointlayer" name="Points"></d3-maplayer>
             <d3-maplayer id="projectlayer" name="Projects"></d3-maplayer>
             <!--
-            <d3-trainlayer id="trainlayer" name="Trains"></d3-trainlayer>
+            <d3-trainlayer id="trainlayer" name="Trains" interval="10000"></d3-trainlayer>
             <d3-twitterlayer id="twitterlayer" name="Tweets"></d3-twitterlayer>
             -->
         </d3-map>
@@ -98,11 +110,13 @@ project-list {
 <script>
 var tmp;
 Polymer({
+		projectid: null,
+		created: function(){
+			this.projects = [];
+            this.core = core;
+		},
         ready: function(){
             var self = this;
-            this.projects = [];
-            this.core = core;
-          
             function reload_projects(){
                 var data = _.filter(core.projects(), function(d){ 
                     return !d.deleted() && d.data('incidentlocation');
@@ -125,23 +139,24 @@ Polymer({
             
             core.projectStore().loaded.then(function(){
                 self.projects = core.projects();
+                self.projectid = core._projectid;
                 reload_projects();
             });
-            //A project is selected
-            this.$['project-list'].addEventListener('activate', function(e) {
-                core.project(e.detail.id);
-                var items = core.project().items().filter(function(d){return !d.deleted() && d.data('type') && d.data('type') == 'feature';});
-                var feats = [];
-                items.forEach(function(d){
-                		feats.push(d.data('feature'));
-                });
-                self.$.pathlayer.newdata(feats);
-                if (core.project().data('incidentLocation')){
-                	var loc = core.project().data('incidentLocation');
-                	self.$.mapelement.center([loc.lng,loc.lat]);
-                	self.$.mapelement.zoom(24);
-                }
-              });
+            
+            this.$.projectmenu.addEventListener('projectselected', function(e) {
+				core.project(e.detail.id);
+				var items = core.project().items().filter(function(d){return !d.deleted() && d.data('type') && d.data('type') == 'feature';});
+				var feats = [];
+				items.forEach(function(d){
+						feats.push(d.data('feature'));
+				});
+				self.$.pathlayer.newdata(feats);
+				if (core.project().data('incidentLocation')){
+					var loc = core.project().data('incidentLocation');
+					self.$.mapelement.center([loc.lng,loc.lat]);
+					self.$.mapelement.zoom(24);
+				}
+			});
 			this.$.suggest.addEventListener('location', function(d){
 				self.$.mapelement.center(d.detail.msg);
 				self.$.mapelement.zoom(24);
@@ -154,6 +169,12 @@ Polymer({
         },
         settings: function(){
         	this.$.login.open();
+        },
+        projectmenu: function(){
+        	this.$.projectmenu.open();
+        },
+        projectidChanged: function(){
+        	console.log('project id: ', this.projectid);
         }
 });
 </script>

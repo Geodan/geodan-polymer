@@ -1,13 +1,13 @@
-<polymer-element name="d3-maplayer" attributes="name">
+<polymer-element name="d3-maplayer" attributes="name visible">
   <template>
-   <style>
-   
-   </style>
   </template>
   <script>
   Polymer({
-     data: [],
-     attached: function(){
+  	visible: true,
+  	created: function(){
+  		this.data = [];
+  	},
+    attached: function(){
          var self = this;
          var map = this.parentNode.map;
          this.map = map;

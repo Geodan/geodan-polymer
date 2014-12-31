@@ -1,0 +1,45 @@
+<polymer-element name="icm-projects">
+<template>
+    <style>
+    
+    </style>
+    
+    <paper-dialog id = 'dialog' autoCloseDisabled heading="Projects">
+        <project-list id="project-list" on-activate="{{activate}}"></project-list>
+        <paper-button label="Close" affirmative autofocus on-tap="{{start}}">Close</paper-button>
+    </paper-dialog>
+    
+</template>
+
+<script>
+(function() {
+Polymer({
+	created: function(){
+		this.items = ['test','test1'];
+	},
+	ready: function(){
+		var self = this;
+        core.projectStore().loaded.then(function(){
+                self.items = core.projects().filter(function(d){return d.data('name') != undefined;});
+        });
+	},
+	open: function(){
+		this.$.dialog.open();
+	},
+	start: function(){
+		this.$.dialog.close();
+	},
+	fromtimestamp: function(timestamp){
+        return new Date(parseInt(timestamp)).toLocaleString();
+    },
+    stringify: function(json){
+        return JSON.stringify(json);
+    },
+    activate: function(d){
+    	var id = d.detail.id;
+    	this.fire('projectselected', {id: id});
+    }
+});  
+})();
+</script>
+</polymer-element>

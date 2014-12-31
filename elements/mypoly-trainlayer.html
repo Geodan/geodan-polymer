@@ -1,34 +1,20 @@
-<polymer-element name="d3-trainlayer" attributes="name">
+<polymer-element name="d3-trainlayer" extends="d3-maplayer" attributes="name interval">
   <template>
-   <style>
-   
-   </style>
+   <shadow></shadow>
   </template>
   <script>
   Polymer({
-     data: [],
+  	 interval: 2000,
+  	 created: function(){
+  	 	 this.super();
+  	 },
      attached: function(){
+     	 this.super();
          var self = this;
          var map = this.parentNode.map;
          var time = new Date();
 		 var freq = 2000;
-		 var firsttime = true;
 		 var treininterval;
-         this.map = map;
-         var onclick = function(d,e){
-             //Added for testing
-             //d3.event.stopPropagation();
-             //self.map.draw({feature: d});
-         }
-         
-         
-         this.layer = new d3.mappu.VectorLayer(this.name,{
-            reproject: true
-         }).addTo(map);
-         this.layer.data = this.data;
-         this.layer.draw();
-         
-         
          /* Prepare treindata as a geoJSON collection */
 		function treindataCallback(json){
 			var collection = {"type":"FeatureCollection","features":[]};
@@ -83,11 +69,7 @@
 		treininterval = setInterval(function(){
 			time = new Date();
 			gettreinen(time);
-		},freq);
-         
-     },
-     newdata: function(d){
-         this.layer.data = d;
+		},this.interval);
      }
   });
   </script>

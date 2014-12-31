@@ -1,5 +1,3 @@
-
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="mypoly-item.html">
 
 <polymer-element name="project-list">
@@ -49,7 +47,7 @@
     }
     
     </style>
-    
+    <!--
     <core-list id="projectlist" data="{{items}}">
       <template>
         <div on-tap="{{activate}}" value="{{model._id}}" class="{{ {selected: selected} }}">
@@ -57,7 +55,7 @@
         </div>
       </template>
     </core-list>
-    <!--
+    -->
     <core-selector selected="{{selected}}">
         <template repeat="{{item,i in items}}">
          <mypoly-item
@@ -81,7 +79,7 @@
          
        </template>
        </core-selector>
-       -->
+       
 </template>
 
 <script>
@@ -97,7 +95,7 @@ Polymer({
         });
     },
     activate: function(a,b,c){
-    	var id = c.getAttribute('value');
+    	var id = c.item.id();
     	this.fire('activate', {id: id});
     },
     fromtimestamp: function(timestamp){
