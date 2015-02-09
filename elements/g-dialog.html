@@ -1,5 +1,5 @@
 <!-- a simple dialog element made with core-overlay -->
-	<polymer-element name="x-dialog" attributes="opened autoCloseDisabled">
+	<polymer-element name="g-dialog" attributes="opened autoCloseDisabled">
 	<template>
 		<style>
 
@@ -22,7 +22,7 @@
 	</template>
 	<script>
 
-	Polymer('x-dialog', {
+	Polymer({
 	
 		ready: function() {
 			this.$.overlay.target = this;

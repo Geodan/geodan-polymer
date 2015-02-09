@@ -1,7 +1,7 @@
 <polymer-element name='my-map'>
 <template>
     <style>
-      d3-layermngr {
+      g-layermngr {
           display: block;
           position: absolute;
           left: 0px;
@@ -9,7 +9,7 @@
           width: 200px;
           z-index: 101;
       }
-      d3-geoservermngr {
+      g-geoservermngr {
           display: block;
           position: absolute;
           right: 0px;
@@ -17,7 +17,7 @@
           width: 200px;
           z-index: 101;
       }
-      d3-map {
+      g-map {
           display: block;
           position: absolute;
           height: 100%;
@@ -51,33 +51,33 @@
     </div>
     <div id="content">
     <div id="map">
-		<d3-layermngr id="layermngr"></d3-layermngr>
-		<d3-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23">
-			<d3-maprasterlayer 
+		<g-layermngr id="layermngr"></g-layermngr>
+		<g-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23">
+			<g-maprasterlayer 
 				id="Mapbox"
 				type="tms"
 				url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
-			></d3-maprasterlayer>
-			<d3-maprasterlayer 
+			></g-maprasterlayer>
+			<g-maprasterlayer 
 				id="Transport"
 				type="tms"
 				visible='false'
 				url="http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png"
-			></d3-maprasterlayer>
-			<d3-maprasterlayer 
+			></g-maprasterlayer>
+			<g-maprasterlayer 
 				id="pico1"
 				type="wms"
 				visible="false"
 				url= "/service/pico/geoserver/pico/wms?"
 				layers= 'pico:pico_sjv_sf'
-			></d3-maprasterlayer>
-			 <d3-maplayer 
+			></g-maprasterlayer>
+			 <g-mapvectorlayer 
 			 	id="gemeenten" 
 			 	name="Gemeenten"
 			 	visible="false"
-			 ></d3-maplayer>
-			 <d3-trainlayer id="nslayer" name="Trains" interval="5000"></d3-trainlayer>
-        </d3-map>
+			 ></g-mapvectorlayer>
+			 <g-trainlayer id="nslayer" name="Trains" interval="5000"></g-trainlayer>
+        </g-map>
       </div>
       <div id='rightbar' class='list' layout vertical>
       	<input type="text" id="selectedInterval" onfocus="this.select();" value="5000">
@@ -86,7 +86,7 @@
 		  <template repeat="{{layer,i in layers}}">
 			<core-collapse opened?="{{selected == i}}" fixedSize style="height:600px">
 			  <h4>{{layer.name}}</h4>
-			  <d3-featurelist layer="{{layer}}"></d3-featurelist>
+			  <g-featurelist layer="{{layer}}"></g-featurelist>
 			</core-collapse>
 		  </template>
 		</core-selector>
@@ -94,42 +94,41 @@
 </template>
 
 <script>
-(function(){
-      Polymer({
-        ready: function(){
-        	var self = this;
-        	this.trains = this.$.nslayer.trains;
-        	this.layers = [];
-        	d3.json("../../d3.mappu/test/gemeenten_simple.topojson", function(error, data) {
-			  if (error) return console.error(error);
-			  var feats = topojson.feature(data, data.objects.gemeenten).features;
-			  var counter = 0;
-			  feats.forEach(function(d){
-			  	d.id = 'id' + counter++;
-			  	//if (self.$.featurelist.selectedList.indexOf(d.id) > -1){
-			  	//	d._selected = true;
-			  	//}
-			  });
-			  self.$.gemeenten.newdata([{id: 'Collection',type: "FeatureCollection", features: feats}]);
-			});
-        	
-        },
-        selectInterval: function(){
-        	this.$.nslayer.interval = parseInt(this.$.selectedInterval.value);
-        },
-        attached: function(){
-        	var self = this;
-        	this.layers = this.$.mapelement.map.layers.filter(function(d){return d.type == 'vector'});
-        	//Bind map to layermanager
-            this.$.layermngr.map = this.$.mapelement.map;
-            //Bind map to featurelist
-            //this.$.featurelist.map = this.$.mapelement.map;
-            
-            this.$.nslayer.addEventListener('newdata', function(e) {
-            		//self.$.featurelist.activeLayerChanged();
-            });
-        }
-      });
-})();
+  Polymer({
+	ready: function(){
+		var self = this;
+		this.trains = this.$.nslayer.trains;
+		this.layers = [];
+		d3.json("../../d3.mappu/test/gemeenten_simple.topojson", function(error, data) {
+		  if (error) return console.error(error);
+		  var feats = topojson.feature(data, data.objects.gemeenten).features;
+		  var counter = 0;
+		  feats.forEach(function(d){
+			d.id = 'id' + counter++;
+			//if (self.$.featurelist.selectedList.indexOf(d.id) > -1){
+			//	d._selected = true;
+			//}
+		  });
+		  self.$.gemeenten.newdata([{id: 'Collection',type: "FeatureCollection", features: feats}]);
+		});
+		
+	},
+	selectInterval: function(){
+		this.$.nslayer.interval = parseInt(this.$.selectedInterval.value);
+	},
+	attached: function(){
+		var self = this;
+		this.layers = this.$.mapelement.map.layers.filter(function(d){return d.type == 'vector'});
+		//Bind map to layermanager
+		this.$.layermngr.map = this.$.mapelement.map;
+		//Bind map to featurelist
+		//this.$.featurelist.map = this.$.mapelement.map;
+		
+		this.$.nslayer.addEventListener('newdata', function(e) {
+				//self.$.featurelist.activeLayerChanged();
+		});
+	}
+  });
+
 </script>
 </polymer-element>

@@ -1,6 +1,4 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-
-<polymer-element name='mypoly-menu' noscript>
+<polymer-element name='g-menu' noscript>
 <template>
     <core-menu selected="0" on-core-select="{{selectAction}}" theme="core-light-theme">
       <core-item icon="settings" label="Users" name="0"></core-item>
@@ -8,7 +6,7 @@
     </core-menu>
 </template>
 <script>
-Polymer('mypoly-menu', {
+Polymer('g-menu', {
   itemTapAction: function(e, detail, sender) {
     //this.$.selection.select(e.target);
   },
