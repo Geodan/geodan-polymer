@@ -3,10 +3,25 @@
 <script src="../bower_components/d3/d3.min.js"></script>
 <script src="../bower_components/webcomponentsjs/webcomponents.js"></script>
 <link rel="import" href="../bower_components/polymer/polymer.html">
-
 <link rel="import" href="../elements/geodan-chart.html">
+<style>
+	#chart {
+		width: 1200px;
+		height: 600px;
+	}
+</style>
+
 </head>
 <body>
-<geodan-chart></geodan-chart>
+<geodan-chart id="chart"></geodan-chart>
+<script>
+document.addEventListener('polymer-ready', function() {
+	var self = this;
+    var chart = document.querySelector('#chart');
+    d3.tsv('./chartdata.tsv', function(error, data){  
+    		chart.newData(data);
+    });
+});
+</script>
 </body>
 </html>
