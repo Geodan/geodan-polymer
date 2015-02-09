@@ -4,7 +4,7 @@
     <script src="../bower_components/platform/platform.js"></script>
     <link rel="import" href="../bower_components/polymer/polymer.html">
     <link rel="import" href="../elements/accel-compass.html">
-    <link rel="import" href="../elements/mypoly-peerjs.html">
+    <link rel="import" href="../elements/g-peerjs.html">
 
     <style>
         html, body {
@@ -20,10 +20,10 @@
   
     <body unresolved>
     <accel-compass-visual></accel-compass-visual>
-    <mypoly-peerjs send=true id='mypeer2' dest='mypeer1'></mypoly-peerjs>
+    <g-peerjs send=true id='mypeer2' dest='mypeer1'></g-peerjs>
     
   <script>
-    //var peerjs = document.querySelector('mypoly-peerjs');
+    //var peerjs = document.querySelector('g-peerjs');
     //document.querySelector('accel-compass-visual').addEventListener('rotate', function(d){
     //        console.log('rotating',d);
     //        peerjs.rotate(d);

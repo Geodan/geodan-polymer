@@ -1,4 +1,4 @@
-<link rel="import" href="mypoly-item.html">
+<link rel="import" href="g-item.html">
 
 <polymer-element name="project-list">
 <template>
@@ -42,7 +42,7 @@
       display: block;
       width: 100%;
     }
-    mypoly-item {
+    g-item {
       margin-bottom: 5px;
     }
     
@@ -58,7 +58,7 @@
     -->
     <core-selector selected="{{selected}}">
         <template repeat="{{item,i in items}}">
-         <mypoly-item
+         <g-item
             item="{{item}}"
             on-tap="{{activate}}"
             hidden?="{{!item._deleted && show=='deleted' || item._deleted && show!=='deleted'}}" 
@@ -75,7 +75,7 @@
                 </p>
             </core-collapse>
             
-         </mypoly-item>
+         </g-item>
          
        </template>
        </core-selector>

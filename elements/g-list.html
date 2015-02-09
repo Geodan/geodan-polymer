@@ -1,7 +1,7 @@
 
-<link rel="import" href="mypoly-item.html">
+<link rel="import" href="g-item.html">
 
-<polymer-element name="mypoly-list" attributes="store show cols">
+<polymer-element name="g-list" attributes="store show cols">
 <template>
     <style>
 
@@ -40,7 +40,7 @@
       display: block;
       width: 100%;
     }
-    mypoly-item {
+    g-item {
       margin-bottom: 5px;
     }
     </style>
@@ -58,7 +58,7 @@
         <template repeat="{{item in items}}">
         
         
-         <mypoly-item
+         <g-item
             item="{{item}}"
             favorite="{{item._deleted}}"
             on-delete-tap="{{handleDeleted}}"
@@ -83,7 +83,7 @@
             <small>Last update: {{item._updated | fromtimestamp}}</small>
             </p>
             
-         </mypoly-item>
+         </g-item>
          
        </template>
     </core-header-panel>
@@ -91,7 +91,7 @@
 
 <script>
 (function() {
-Polymer('mypoly-list', {
+Polymer({
     toggleList: function(x,y,z){
         //TODO: aaaaargh...
         this.show = x.detail.item.attributes[0].value;

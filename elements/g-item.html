@@ -1,4 +1,4 @@
-<polymer-element name="mypoly-item" attributes="item">
+<polymer-element name="g-item" attributes="item">
  <template>
  <style>
     :host {
@@ -67,7 +67,7 @@
     -->
   </template>
   <script>
-  Polymer('mypoly-item', {
+  Polymer({
       item: null,
       save: function(){
           console.log('Itemchange');

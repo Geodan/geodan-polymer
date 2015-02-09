@@ -1,7 +1,4 @@
-<link rel="import" href="mypoly-mapitem.html">
-<!--<link rel="import" href="./mypoly-drawingmenu.html">-->
-
-<polymer-element name='d3-map' attributes='latitude longitude zoom'>
+<polymer-element name='g-map' attributes='latitude longitude zoomlevel'>
 
  <template>
   <style>
@@ -49,39 +46,44 @@
 
  </template>
  <script>
- var tmp;
  (function(){
  Polymer({
     width: 400,
     height: 400,
+    zoom: null,
     created: function(){
          this.features = [];
+         this.center = [];
     },
     attached: function(){
         this.map = new d3.mappu.Map(this.$.map,{
             center: [this.longitude,this.latitude],
             zoom: this.zoomlevel
         });
-        tmp = this.map;
+        this.zoom = this.map.zoom;
+        this.center = this.map.center;
+    },
+    resize: function(){
+    	this.map.resize();
     },
     redraw: function(){
         this.map.redraw();
     },
-    zoom: function(val){
-        this.map.zoom = val;
-    },
+    //zoom: function(val){
+    //    this.map.zoom = val;
+    //},
     zoomTo: function(extent){
         console.warn('not implemented');
     },
-    center: function(position){
-    	if (position[0] >= -180 && position[0] <= 180 
-    			&& position[1] >= -90 && position[1] <= 90){
-    		this.map.center = position;
-    	}
-    	else {
-    		console.warn('Wrong coordinates: ',position);
-    	}
-    },
+    //center: function(position){
+    //	if (position[0] >= -180 && position[0] <= 180 
+    //			&& position[1] >= -90 && position[1] <= 90){
+    //		this.map.center = position;
+    //	}
+    //	else {
+    //		console.warn('Wrong coordinates: ',position);
+    //	}
+    //},
     draw: function(d){
         this.map.redraw(d);
     },

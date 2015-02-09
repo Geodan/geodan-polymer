@@ -1,19 +1,19 @@
 <polymer-element name='cow-dashboard'>
 
-<link rel="import" href="../elements/mypoly-wsstatus.html">
-<link rel="import" href="../elements/mypoly-item.html">
+<link rel="import" href="../elements/g-wsstatus.html">
+<link rel="import" href="../elements/g-item.html">
 <link rel="import" href="../elements/project-list.html">
-<link rel="import" href="../elements/mypoly-map.html">
-<link rel="import" href="../elements/mypoly-maplayer.html">
-<link rel="import" href="../elements/mypoly-trainlayer.html">
-<link rel="import" href="../elements/mypoly-twitterlayer.html">
-<link rel="import" href="../elements/mypoly-maprasterlayer.html">
-<link rel="import" href="../elements/mypoly-layermngr.html">
-<link rel="import" href="../elements/mypoly-geoservermngr.html">
-<link rel="import" href="../elements/mypoly-dialog.html">
-<link rel="import" href="../elements/geodan-suggest.html">
+<link rel="import" href="../elements/g-map.html">
+<link rel="import" href="../elements/g-mapvectorlayer.html">
+<link rel="import" href="../elements/g-trainlayer.html">
+<link rel="import" href="../elements/g-twitterlayer.html">
+<link rel="import" href="../elements/g-maprasterlayer.html">
+<link rel="import" href="../elements/g-layermngr.html">
+<link rel="import" href="../elements/g-geoservermngr.html">
+<link rel="import" href="../elements/g-dialog.html">
+<link rel="import" href="../elements/g-suggest.html">
 <!--
-<link rel="import" href="../elements/mypoly-peersforcelayout.html">
+<link rel="import" href="../elements/g-peersforcelayout.html">
 -->
 <link rel="import" href="../elements/icm-login.html">
 <link rel="import" href="../elements/icm-projectmenu.html">
@@ -28,7 +28,7 @@ core-header-panel {
     height: 100%;
     width: 100%;
 }
-d3-map {
+g-map {
     height: 100%;
     float: left;
     width: 100%;
@@ -39,7 +39,7 @@ d3-map {
     height: 100%;
     width: 100%;
 }
-d3-layermngr {
+g-layermngr {
     display: block;
     position: absolute;
     right: 0px;
@@ -72,37 +72,37 @@ project-list {
       <core-splitter minSize="200px" direction="left"></core-splitter>
 
       <div class='page content'>
-        <d3-map id="mapelement" latitude="52.2" longitude="5.2" zoom="3">
-            <d3-maprasterlayer 
+        <g-map id="mapelement" latitude="52.2" longitude="5.2" zoom="3">
+            <g-maprasterlayer 
                 id="mapbox"
                 type="tms"
                 url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
-            ></d3-rastermaplayer>
-            <d3-maprasterlayer 
+            ></g-maprasterlayer>
+            <g-maprasterlayer 
                 id="mapbox-dark"
                 type="tms"
                 visible="false"
                 url="http://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png"
-            ></d3-rastermaplayer>
+            ></g-maprasterlayer>
             
             <!--
-            <d3-maprasterlayer 
+            <g-maprasterlayer 
                 id="pico1"
                 type="wms"
                 url= "/service/pico/geoserver/pico/wms?"
                 layers= 'pico:pico_sjv_sf'
-            ></d3-rastermaplayer>
+            ></g-maprasterlayer>
             -->
-            <d3-maplayer id="pathlayer" name="Lines"></d3-maplayer>
-            <d3-maplayer id="pointlayer" name="Points"></d3-maplayer>
-            <d3-maplayer id="projectlayer" name="Projects"></d3-maplayer>
+            <g-mapvectorlayer id="pathlayer" name="Lines"></g-mapvectorlayer>
+            <g-mapvectorlayer id="pointlayer" name="Points"></g-mapvectorlayer>
+            <g-mapvectorlayer id="projectlayer" name="Projects"></g-mapvectorlayer>
             <!--
-            <d3-trainlayer id="trainlayer" name="Trains" interval="10000"></d3-trainlayer>
-            <d3-twitterlayer id="twitterlayer" name="Tweets"></d3-twitterlayer>
+            <g-trainlayer id="trainlayer" name="Trains" interval="10000"></g-trainlayer>
+            <g-twitterlayer id="twitterlayer" name="Tweets"></g-twitterlayer>
             -->
-        </d3-map>
+        </g-map>
       </div>
-      <d3-layermngr id="layermngr"></d3-layermngr>
+      <g-layermngr id="layermngr"></g-layermngr>
     </div>
 </core-header-panel>
 

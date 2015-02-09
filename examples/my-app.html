@@ -13,27 +13,27 @@
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../elements/mypoly-wsstatus.html">
-<link rel="import" href="../elements/mypoly-item.html">
-<link rel="import" href="../elements/mypoly-list.html">
-<link rel="import" href="../elements/mypoly-map.html">
-<link rel="import" href="../elements/mypoly-maplayer.html">
-<link rel="import" href="../elements/mypoly-maprasterlayer.html">
-<link rel="import" href="../elements/mypoly-layermngr.html">
-<link rel="import" href="../elements/mypoly-geoservermngr.html">
-<link rel="import" href="../elements/mypoly-dialog.html">
+<link rel="import" href="../elements/g-wsstatus.html">
+<link rel="import" href="../elements/g-item.html">
+<link rel="import" href="../elements/g-list.html">
+<link rel="import" href="../elements/g-map.html">
+<link rel="import" href="../elements/g-mapvectorlayer.html">
+<link rel="import" href="../elements/g-maprasterlayer.html">
+<link rel="import" href="../elements/g-layermngr.html">
+<link rel="import" href="../elements/g-geoservermngr.html">
+<link rel="import" href="../elements/g-dialog.html">
 
-<link rel="import" href="../elements/mypoly-peersforcelayout.html">
+<link rel="import" href="../elements/g-peersforcelayout.html">
 
 <polymer-element name='my-app'>
 <template>
     <style>
-      mypoly-list {
+      g-list {
           height: 100%;
           float: left;
           width: 100%;
       }
-      d3-layermngr {
+      g-layermngr {
           display: block;
           position: absolute;
           left: 0px;
@@ -42,7 +42,7 @@
           width: 200px;
           z-index: 101;
       }
-      d3-map {
+      g-map {
           height: 100%;
           float: left;
           width: 100%;
@@ -98,7 +98,7 @@
           <core-item icon="{{page.icon}}" label="{{page.name}}"></core-item>
         </template>
     </core-menu>
-    <mypoly-wsstatus></mypoly-wsstatus>
+    <g-wsstatus></g-wsstatus>
   </core-header-panel>
   <!--
   <span tool>
@@ -108,35 +108,35 @@
   <div class="content">
   <core-pages selected="{{selected}}">
     <div class='page'>
-      <mypoly-list id="socketserver-list" store="socketservers" on-edit-tap="edit" show="all" cols="protocol ip port"></mypoly-list>
+      <g-list id="socketserver-list" store="socketservers" on-edit-tap="edit" show="all" cols="protocol ip port"></g-list>
     </div>
     <div class='page'>
-      <mypoly-list id="user-list" store="users" show="all" cols="name"></mypoly-list>
+      <g-list id="user-list" store="users" show="all" cols="name"></g-list>
     </div>
     <div class='page'>
-      <mypoly-list id="peer-list" store="peers" show="all"></mypoly-list>
+      <g-list id="peer-list" store="peers" show="all"></g-list>
     </div>
     <div class='page'>
-      <mypoly-list id="project-list" store="projects" show="all" cols="name"></mypoly-list>
+      <g-list id="project-list" store="projects" show="all" cols="name"></g-list>
     </div>
     <div class='page'>
-      <mypoly-list id="item-list" store="items" show="all" cols="type feature beeld"></mypoly-list>
+      <g-list id="item-list" store="items" show="all" cols="type feature beeld"></g-list>
     </div>
     <div class='page'>
-      <d3-layermngr id="layermngr"></d3-layermngr>
-      <d3-map id="item-map" latitude="52.2" longitude="5.2" zoom="3">
-        <d3-maprasterlayer 
+      <g-layermngr id="layermngr"></g-layermngr>
+      <g-map id="item-map" latitude="52.2" longitude="5.2" zoom="3">
+        <g-maprasterlayer 
             id="mapbox"
             type="tms"
             url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
-        ></d3-maprasterlayer>
-        <d3-maplayer id="pathlayer"></d3-maplayer>
-        <d3-maplayer id="pointlayer"></d3-maplayer>
-      </d3-map>
+        ></g-maprasterlayer>
+        <g-mapvectorlayer id="pathlayer"></g-mapvectorlayer>
+        <g-mapvectorlayer id="pointlayer"></g-mapvectorlayer>
+      </g-map>
     </div>
     
     <div class='page'>
-      <mypoly-peersforcelayout id="peersforcelayout" store="peers"></mypoly-peersforcelayout>
+      <g-peersforcelayout id="peersforcelayout" store="peers"></g-peersforcelayout>
     </div>
     
     </core-pages>
@@ -146,7 +146,7 @@
 
 <script>
 (function(){
-      Polymer('my-app', {
+      Polymer({
         ready: function(){
             var self = this;
             this.pages = [
