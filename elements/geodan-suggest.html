@@ -17,6 +17,7 @@
  }
    
    </style>
+ 
    <input size=40 id="geosuggest" on-keydown="{{suggest}}">
    	<core-list id="suggestlist" data="{{suggestions}}">
 	  <template>
@@ -49,7 +50,6 @@
      iselected: 0,
   	 suggestions: [],
      ready: function(){
-        
      },
      suggest: function(e){
      	 if (e.keyCode == 13){ //enter

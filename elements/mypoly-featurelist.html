@@ -1,0 +1,125 @@
+<polymer-element name="d3-featurelist" attributes="layer">
+<template>
+   <style>
+   core-list {
+      	  position: absolute;
+      	  height: 100%;
+      	  width: 100%;
+      }
+   </style>
+   <!--
+   <paper-dropdown-menu label="Layer">
+		<paper-dropdown class="dropdown">
+			<core-menu id='layerselector' class="menu" selected="1" on-core-select="{{layerSelectAction}}">
+				<paper-item value='0'>0</paper-item>
+				<template repeat="{{layers}}">
+					<paper-item value='{{id}}'>{{name}}</paper-item>
+				</template>
+			</core-menu>
+		</paper-dropdown>
+	</paper-dropdown-menu>
+	-->
+	<template bind="{{layer}}">{{name}}
+		Length: {{lastupdate}}</template>
+	<template id="table" bind>
+		
+		<sortable-table
+			class="default"
+			pageSize=20
+			sortColumn='id'
+			footerTemplate="defaultPager"
+			filterTemplate="simpleFilters"
+			data="{{data}}"
+			columns="{{columns}}"
+			selected="{{selected}}"
+			rowSelection="{{rowSelection}}"
+			multiSelect="{{multiSelect}}"
+			checkbox="{{checkbox}}"
+			>
+			<template id="idTemplate">
+					<td style="width:75px;text-align:center;">
+						{{value}}
+					</td>
+				</template>
+		</sortable-table>
+	</template>
+	<!--
+	<core-list id="trainlist" on-core-activate="{{featureHandler}}}" data="{{data}}" height="20" flex >
+		<template>
+		<div class="row {{ {selected: selected}| tokenList }}">
+		{{model.id}} {{model.properties| stringify}}
+		</div>
+		</template>
+	</core-list>
+	-->
+</template>
+<script>
+Polymer({
+	lastupdate: new Date().getTime(),
+	ready: function(){
+		this.selected = [];
+		this.selectedList = []; //list with selected id's
+		var data = [];
+		var columns = [];
+		var model = {
+			data: data,
+			columns: columns,
+			selected: [], //Careful, needs an array with multiSelect
+			rowSelection: true,
+			multiSelect: true,
+			checkbox: true
+		};
+		this.$.table.model = model;
+		var self = this;
+		window.setInterval(function(d){ //FIXME, this should be done by binding!
+			self.layerChanged();
+		},4000);
+	},
+	lastupdateChanged: function(){
+		console.log('!!');
+	},
+    layerChanged: function(){
+    	var columns = [];
+    	if (this.layer.data && this.layer.data[0] && this.layer.data[0].properties){ 
+			var row = this.layer.data[0].properties;
+			for (var key in row){
+				columns.push({name: key});
+			}
+		}
+    	this.$.table.model.columns = columns;
+    	var data = [];
+    	this.$.table.model.selected = [];
+    	if (this.layer.data){
+			this.layer.data.forEach(function(d){
+				if (d.properties){
+					data.push(d.properties);
+				}else
+				{
+					data.push({id: d.id});
+				}
+			});
+			this.$.table.model.data = data;
+			this.selected = this.$.table.model.selected;
+		}
+    },
+    selectedChanged: function(){
+    	this.selectedList = this.selected.map(function(d){return d.id;});
+    	var self = this;
+    	var coords = null;
+    	if (this.layer.data){
+			this.layer.data.forEach(function(d){
+				d._selected = false;
+				if (self.selectedList.indexOf(d.id) > -1){
+					d._selected = true;
+					if (d.geometry.coordinates.length == 2){
+						coords = d.geometry.coordinates;
+					};
+				}
+			});
+			if (coords) self.layer.map.center = coords;
+			//this.activeLayer.draw(true);
+		}
+    }
+});
+</script>
+</polymer-element>

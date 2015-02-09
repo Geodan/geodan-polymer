@@ -4,9 +4,27 @@
   </template>
   <script>
   Polymer({
-  	 interval: 2000,
+  	 interval: 5000,
+  	 duration: 5000,
+  	 
   	 created: function(){
   	 	 this.super();
+  	 	 this.trains = [];
+  	 	 this.events= [{
+			 event: 'mouseover',
+			 action: function(d){
+			 	var fill = d3.select(this).style('fill'); 
+			 	d3.select(this).transition().duration(500).style('fill','red').transition().duration(500).style('fill', fill);
+			 }
+  	 	 },{
+  	 	 	 event: 'click',
+  	 	 	 action: function(d){
+  	 	 	 	 console.log(d3.select(this));
+  	 	 	 }
+  	 	 }];
+  	 },
+  	 intervalChanged: function(){
+  	 	 this.poll();
   	 },
      attached: function(){
      	 this.super();
@@ -14,8 +32,13 @@
          var map = this.parentNode.map;
          var time = new Date();
 		 var freq = 2000;
-		 var treininterval;
-         /* Prepare treindata as a geoJSON collection */
+		 this.duration = freq;
+		 this.treininterval;
+		 this.poll();
+     },
+     poll: function(){
+     	var self = this;
+  	 	  /* Prepare treindata as a geoJSON collection */
 		function treindataCallback(json){
 			var collection = {"type":"FeatureCollection","features":[]};
 			json.forEach(function(d){
@@ -59,17 +82,25 @@
 			});
 			self.newdata(collection.features);
 		}
-		function gettreinen(t){
+  	 	function gettreinen(t){
 			var timestring = t.toISOString();
 			var tok = 'ns:prima14';//NSadmin 20intercity13
 			var datasource_treinen = "http://research.geodan.nl/service/treinen/location/api/positions?username=ns&timestamp="+timestring;
 			d3.json(datasource_treinen,treindataCallback);
 		}
-		gettreinen(time);
-		treininterval = setInterval(function(){
-			time = new Date();
-			gettreinen(time);
-		},this.interval);
+		clearInterval(this.treininterval);
+		 if (this.interval == 0){
+			 
+		 }
+		 else if (this.interval <= 1000){
+			 console.warn('Too small interval');
+		 }
+		 else{
+			 this.treininterval = setInterval(function(){
+				time = new Date();
+				gettreinen(time);
+			},this.interval);
+		 } 
      }
   });
   </script>

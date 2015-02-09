@@ -1,11 +1,15 @@
-<polymer-element name="d3-maplayer" attributes="name visible">
+<polymer-element name="d3-maplayer" attributes="name visible reproject">
   <template>
   </template>
   <script>
   Polymer({
   	visible: true,
+  	duration: 0,
+  	
+  	reproject: true,
   	created: function(){
   		this.data = [];
+  		this.events = [];
   	},
     attached: function(){
          var self = this;
@@ -17,15 +21,18 @@
              //self.map.draw({feature: d});
          }
          
-         
          this.layer = new d3.mappu.VectorLayer(this.name,{
-            reproject: true
+            visible: this.visible,
+            reproject: this.reproject,
+            duration: this.duration,
+            events: this.events
          }).addTo(map);
          this.layer.data = this.data;
          this.layer.draw();
      },
      newdata: function(d){
-         this.layer.data = d;
+        this.layer.data = d;
+		this.fire('newdata');
      }
   });
   </script>

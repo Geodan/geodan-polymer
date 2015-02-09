@@ -82,15 +82,16 @@
       created: function(){
       	  this.map = {};
       	  this.layers = [];
+      	  this.tmp_layers =[];
       },
       ready: function(){
-          //this.tmp_layers =[];
           //this.tmp_layers = this.layers;//.reverse();
-          
       },
       layersChanged: function(){
             //this.tmp_layers = this.layers.reverse();
-      
+      },
+      mapChanged: function(){
+      	  this.layers = this.map.layers;
       },
       collapse: function(){
           this.$.collapse1.toggle();
