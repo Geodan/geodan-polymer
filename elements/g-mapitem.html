@@ -1,6 +1,6 @@
 <polymer-element name="g-mapitem" attributes="feature">
   <script>
-  Polymer('d3-mapitem', {
+  Polymer({
      ready: function(){
          this.parentNode.features.push(this.feature);
      }

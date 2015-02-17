@@ -13,13 +13,13 @@
     <script type="text/javascript">
         
         var core = new Cow.core({
-              herdname: 'test'
+              herdname: 'ontw'
         });
         //add a default socketserver
         core.socketservers({
             _id: 'default', 
             //data: {protocol:'ws',ip:'192.168.24.95', port:8081}
-            data: {protocol: 'wss', ip: 'websocket.geodan.nl', port: 443, dir: 'icms'}
+            data: {protocol: 'wss', ip: 'websocket.geodan.nl', port: 443, dir: 'ontw'}
         });
         core.socketserver('default');
         var connection = core.connect();
