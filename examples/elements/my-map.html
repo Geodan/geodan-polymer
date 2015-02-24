@@ -1,36 +1,40 @@
 <polymer-element name='my-map'>
 <template>
     <style>
+    g-map {
+          position: relative;
+          height: 100%;
+      }
       g-layermngr {
           display: block;
           position: absolute;
-          left: 0px;
+          left: 10px;
           top: 50px;
+          width: 200px;
+          z-index: 101;
+      }
+      g-drawingmenu {
+          display: block;
+          position: absolute;
+          left: 10px;
+          bottom: 50px;
           width: 200px;
           z-index: 101;
       }
       g-geoservermngr {
           display: block;
           position: absolute;
-          right: 0px;
+          right: 10px;
           top: 50px;
           width: 200px;
           z-index: 101;
       }
-      g-map {
-          display: block;
-          position: absolute;
-          height: 100%;
-          float: left;
-          width: 50%;
+      #content {
+      	  height: 100%;
       }
-      /*
       #map {
-      	  position: relative;
-      	  left: 0px;
-      	  top: 0px;
-      	  width: 90%;
-      }*/
+      	  height: 100%;
+      }
       #rightbar {
       	  position: absolute;
       	  right: 0px;
@@ -46,19 +50,21 @@
         height: 500px;
       }
     </style>
-    <div id="header">
-    Head 
-    </div>
-    <div id="content">
     <div id="map">
-		<g-layermngr id="layermngr"></g-layermngr>
+    
+    	<g-drawingmenu id="drawmenu" map="{{map}}"></g-drawingmenu>
+		<g-layermngr id="layermngr" map="{{map}}"></g-layermngr>
+	
 		<g-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23">
+
 			<g-maprasterlayer 
 				id="Mapbox"
 				type="tms"
 				url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
 			></g-maprasterlayer>
-			<g-maprasterlayer 
+			<g-mapvectorlayer id="sketch" name="Sketch"></g-mapvectorlayer>
+		<!--			
+			<g-maprasterlayer
 				id="Transport"
 				type="tms"
 				visible='false'
@@ -70,15 +76,18 @@
 				visible="false"
 				url= "/service/pico/geoserver/pico/wms?"
 				layers= 'pico:pico_sjv_sf'
-			></g-maprasterlayer>
+			></g-maprasterlayer>-->
+			<!--
 			 <g-mapvectorlayer 
 			 	id="gemeenten" 
 			 	name="Gemeenten"
 			 	visible="false"
 			 ></g-mapvectorlayer>
 			 <g-trainlayer id="nslayer" name="Trains" interval="5000"></g-trainlayer>
+			 -->
         </g-map>
       </div>
+      <!--
       <div id='rightbar' class='list' layout vertical>
       	<input type="text" id="selectedInterval" onfocus="this.select();" value="5000">
       	<input type="button" value="interval" on-click="{{selectInterval}}">
@@ -91,14 +100,24 @@
 		  </template>
 		</core-selector>
       </div>
+      -->
 </template>
 
 <script>
+var tmp;
   Polymer({
 	ready: function(){
 		var self = this;
-		this.trains = this.$.nslayer.trains;
 		this.layers = [];
+		window.setTimeout(function(){ //FIXME
+				tmp = self.$.mapelement.map;
+				self.$.mapelement.resize();
+				self.$.mapelement.map.zoom = 23;
+				self.$.mapelement.map.center = [5.2,52];
+		},1000);
+		/*
+		this.trains = this.$.nslayer.trains;
+		
 		d3.json("../../d3.mappu/test/gemeenten_simple.topojson", function(error, data) {
 		  if (error) return console.error(error);
 		  var feats = topojson.feature(data, data.objects.gemeenten).features;
@@ -111,22 +130,16 @@
 		  });
 		  self.$.gemeenten.newdata([{id: 'Collection',type: "FeatureCollection", features: feats}]);
 		});
-		
+		*/
 	},
 	selectInterval: function(){
-		this.$.nslayer.interval = parseInt(this.$.selectedInterval.value);
+		//this.$.nslayer.interval = parseInt(this.$.selectedInterval.value);
 	},
 	attached: function(){
 		var self = this;
 		this.layers = this.$.mapelement.map.layers.filter(function(d){return d.type == 'vector'});
-		//Bind map to layermanager
-		this.$.layermngr.map = this.$.mapelement.map;
-		//Bind map to featurelist
-		//this.$.featurelist.map = this.$.mapelement.map;
-		
-		this.$.nslayer.addEventListener('newdata', function(e) {
-				//self.$.featurelist.activeLayerChanged();
-		});
+		this.map = this.$.mapelement.map;
+		this.$.mapelement.resize();
 	}
   });
 

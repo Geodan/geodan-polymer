@@ -1,95 +1,97 @@
-<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
-<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
-<link rel="import" href="../bower_components/core-menu-button/core-menu-button.html">
-<link rel="import" href="../bower_components/core-iconset-svg/core-iconset-svg.html">
-
-<polymer-element name="g-drawingmenu">
+<polymer-element name="g-drawingmenu" attributes="map">
  <template>
  <style>
- paper-icon-button{
-     color: black;
+ paper-fab{
+     margin-left: 5px;
+     
  }
+ .list > *.core-selected {
+          background: green;
+ }
+ .list > #editfab {
+ 	 background: orange;
+ }
+ .list > #editfab.core-selected {
+ 	 background: green;
+ }
+ .list > #deletefab {
+ 	 background: orange;
+ }
+ 
+ .list > #cancelfab {
+ 	 background: gray;
+ }
+       
  </style>
- 
- <core-iconset-svg id="custom-icons" iconSize="20">
-  <svg>
-    <defs>
-      <g id="myline">
-        <line x1="0" y1="0" x2="20" y2="20" style="stroke:{{selectedLine.stroke}};stroke-width:2" />
-      </g>
-      <g id="mypolygon">
-        <polygon points="22,1 30,21 17,25 12,23" style="fill:{{selectedPolygon.fill}};stroke:{{selectedPolygon.stroke}};stroke-width:1" />
-     </g>
-    </defs>
-  </svg>
-</core-iconset-svg>
- 
- 
- 
- <core-ajax
-    auto
-    url="../config/default.json"
-    handleAs="json"
-    on-core-response="{{handleResponse}}"></core-ajax>
-    
-    <paper-menu-button src="./images/mapicons/{{selectedIcon.url}}">
-        <template repeat="{{icon,i in icons}}">
-            <core-item><paper-icon-button iconSrc="./images/mapicons/{{icon.url}}" label="{{icon.text}}" on-tap="{{buttonClick}}" nr="{{i}}"></paper-icon-button></core-item>
-        </template>
-    </paper-menu-button>
-    
-    <core-menu-button icon="custom-icons:myline">
-        <template repeat="{{line,i in lines}}">
-            <core-item on-tap="{{lineClick}}" nr="{{i}}">
-                <svg height="21" width="21">
-                    <line x1="0" y1="0" x2="20" y2="20" style="stroke:{{line.stroke}};stroke-width:2" />
-                </svg>
-                </button>
-            </core-item>
-        </template>
-    </core-menu-button>
-    
-    <core-menu-button icon="custom-icons:mypolygon">
-        <template repeat="{{polygon,i in polygons}}">
-            <core-item on-tap="{{polygonClick}}" nr="{{i}}">
-              <svg height="21" width="21">
-                <polygon points="22,1 30,21 17,25 12,23" style="fill:{{polygon.fill}};stroke:{{polygon.stroke}};stroke-width:1" />
-              </svg>
-            </core-item>
-        </template>
-    </core-menu-button>
-    
+ <core-selector id="drawbuttons" class="list" selected="-1">
+	 <paper-fab mini id="pointfab" icon="room" on-click="{{startPoint}}"></paper-fab>
+	 <paper-fab mini id="linefab" icon="gesture" on-click="{{startLine}}"></paper-fab>
+	 <paper-fab mini id="polygonfab" icon="bookmark" on-click="{{startPolygon}}"></paper-fab>
+	 <br>
+	 <paper-fab mini id="editfab" icon="create" on-click="{{startEdit}}"></paper-fab>
+	 <paper-fab mini id="deletefab" icon="content-cut" on-click="{{startRemove}}"></paper-fab>
+	 <paper-fab mini id="cancelfab" icon="remove-circle-outline" on-click="{{cancel}}"></paper-fab>
+ </core-selector>
+
  </template>
  <script>
 Polymer({
-        icons: [],
-        lines: [],
-        polygons: [],
-        selectedIcon: {url: "",text: ""},
-        selectedLine: {stroke: "red"},
-        selectedPolygon: {stroke: "red", fill: "red"},
         ready: function(){
+        	this.sketch = {};
+        	this.map = {};
         },
-        handleResponse: function(response){
-            this.icons = response.detail.response.icontypes;
-            this.lines = response.detail.response.linestyles;
-            this.polygons = response.detail.response.polygonstyles;
-            this.selectedIcon = this.icons[0];
-            this.selectedLine = this.lines[0];
-            this.selectedPolygon = this.polygons[0];
+        addSketchLayer: function(){
+        	//TODO: new layer gets incorrect translate and scale factor
+        	//var sketchlayer = new d3.mappu.VectorLayer('sketchlayer');
+        	//this.map.removeLayer('sketchlayer');
+        	//this.map.addLayer(sketchlayer);
+        	this.sketch = new d3.mappu.Sketch('mysketch', {
+        		layer: this.map.getLayersByName('Sketch')[0] //using existing layer for now
+        	});
         },
-        buttonClick: function(a,b,c){
-            this.selectedIcon = this.icons[c.getAttribute('nr')];
-            var url = a.currentTarget.iconSrc_;
-            this.fire('draw',{type: 'Point', url: url});
+        
+        startPoint: function(){
+        	var self = this;
+        	var featureReady = function(e){
+        		self.map.mapdiv.removeEventListener('featureReady', featureReady);
+				var feature = self.sketch.feature;
+				self.fire('newfeature', {feature: feature}); 
+				self.$.drawbuttons.selected = -1;
+			};
+        	this.addSketchLayer();
+        	this.sketch.cancel();
+        	this.sketch.draw('Point');
+        	this.map.mapdiv.addEventListener('featureReady', featureReady);
         },
-        lineClick: function(a,b,c){
-            this.selectedLine = this.lines[c.getAttribute('nr')];
-            this.fire('draw',{type: 'LineString', stroke: this.selectedLine.stroke});
+        startLine: function(){
+        	var self = this;
+        	var featureReady = function(e){
+        		self.map.mapdiv.removeEventListener('featureReady', featureReady);
+				var feature = self.sketch.feature;
+				self.fire('newfeature', {feature: feature}); 
+				self.$.drawbuttons.selected = -1;
+			};
+        	this.addSketchLayer();
+        	this.sketch.cancel();
+        	this.sketch.draw('LineString');
+        	this.map.mapdiv.addEventListener('featureReady', featureReady);
         },
-        polygonClick: function(a,b,c){
-            this.selectedPolygon = this.polygons[c.getAttribute('nr')];
-            this.fire('draw',{type: 'Polygon', stroke: this.selectedPolygon.stroke, fill: this.selectedPolygon.fill});
+        startPolygon: function(){
+        	var self = this;
+        	var featureReady = function(e){
+        		self.map.mapdiv.removeEventListener('featureReady', featureReady);
+				var feature = self.sketch.feature;
+				self.fire('newfeature', {feature: feature}); 
+				self.$.drawbuttons.selected = -1;
+			};
+        	this.addSketchLayer();
+        	this.sketch.cancel();
+        	this.sketch.draw('Polygon');
+        	this.map.mapdiv.addEventListener('featureReady', featureReady);
+        },
+        cancel: function(){
+        	this.sketch.cancel();
+        	this.$.drawbuttons.selected = -1;
         }
 });
 </script>

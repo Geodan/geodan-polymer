@@ -2,41 +2,9 @@
 
  <template>
   <style>
-	core-header-panel {
-		height: 100%;
-		overflow: auto;
-		width: 100%;
-		float: left;
-		/*-webkit-overflow-scrolling: touch;*/ 
-	}
-	core-toolbar {
-		position: relative;
-		background: #03a9f4;
-		color: white;
-	}
-	.container {
-		width: 100%;
-		margin: 50px auto;
-	}
-	@media (min-width: 481px) {
-		.container {
-			width: 100%;
-		}
-	}
-	
-	:host {
-		display: block;
-		width: 100%;
-	}
-	
 	#map {
 		width: 100%;
 		height: 100%;
-	}
-	  
-	.entity {
-		fill: none;
-		stroke: red;
 	}
   </style>
   <div id="map"></div>
@@ -45,7 +13,7 @@
  var tmp;
  (function(){
  Polymer({
-    zoom: 23,
+    zoomlevel: 23,
     latitude: 52.2,
     longitude: 5.2,
     observe: {
@@ -59,8 +27,8 @@
     attached: function(){
         this.map = new d3.mappu.Map(this.$.map,{
             center: [this.longitude,this.latitude],
-            zoom: this.zoomlevel
         });
+        this.map.zoom = this.zoomlevel;
     },
     resize: function(){
     	this.map.resize();
@@ -92,9 +60,6 @@
     },
     layers: function(){
         return this.map.layers;
-    },
-    map: function(){
-        return this.map;
     }
  });
  })();
