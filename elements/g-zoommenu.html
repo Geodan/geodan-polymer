@@ -1,0 +1,24 @@
+<polymer-element name="g-zoommenu" attributes="map">
+ <template>
+ <style>
+ </style>
+ 
+	 <paper-fab mini id="zoomIn" icon="add" on-click="{{zoomIn}}"></paper-fab>
+	 <paper-fab mini id="zoomOut" icon="remove" on-click="{{zoomOut}}"></paper-fab>
+ 
+ 
+ </template>
+ <script>
+Polymer({
+		ready: function(){
+        	this.map = {};
+        },
+		zoomIn: function(){
+			this.map.zoom++;
+		},
+		zoomOut: function(){
+			this.map.zoom--;
+		}
+});
+</script>
+</polymer-element>

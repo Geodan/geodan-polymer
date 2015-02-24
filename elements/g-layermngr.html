@@ -1,7 +1,9 @@
+<!--
 <link rel="import" href="../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/core-drag-drop/core-drag-drop.html">
-<polymer-element name="g-layermngr">
+-->
+<polymer-element name="g-layermngr" attributes="map">
   <template>
    <style>
    
@@ -11,6 +13,13 @@
       background-color: #efefef;
       border: 1px solid #ddd;
       opacity: 0.8;
+    }
+    
+    .form {
+    	padding: 2px;
+    	background-color: #efefef;
+    	border: 1px solid #ddd;
+    	opacity: 0.8;
     }
 
     core-item.layer .name {
@@ -25,7 +34,10 @@
     }
     
    </style>
-   <core-icon-button icon='expand-more' on-click="{{collapseLayers}}"></core-icon-button>Layers<br>
+   
+   <!--<core-icon-button icon='expand-more' on-click="{{collapseLayers}}"></core-icon-button>Layers<br>-->
+   <paper-fab mini icon="maps:layers" on-click="{{collapseLayers}}"></paper-fab>
+   <paper-fab mini icon="av:playlist-add" on-click="{{collapse}}"></paper-fab>
    <core-collapse id="collapseLayers">
    <template repeat="{{layer in layers}}"><!--TODO: find a way to reverse the order of display (but not the array itself) -->
        <core-item class="layer"
@@ -43,19 +55,20 @@
         </core-item>
    </template>
    </core-collapse>
-   <core-icon-button icon='expand-more' on-click="{{collapse}}"></core-icon-button>Add Layer
+   
+   <!--<core-icon-button icon='expand-more' on-click="{{collapse}}"></core-icon-button>Add Layer-->
    <core-collapse id="collapse1">
     <div class="form">
-       <paper-input required='true' id="layername" label="Name"></paper-input><br>
-       <paper-radio-group selected="small" id="layertype">
+       <paper-input required='true' id="layername" floatingLabel label="Name"></paper-input><br>
+       <paper-radio-group selected="tms" id="layertype">
           <paper-radio-button name="tms" label="TMS"></paper-radio-button>
           <paper-radio-button name="wms" label="WMS"></paper-radio-button>
        </paper-radio-group><br>
-       <paper-input required='true' id="wmsurl" label="WMS_URL" value = "http://geodata.nationaalgeoregister.nl/kadastralekaart/wms?"></paper-input><br>
-       <paper-input required='true' id="layername" label="LayerName" value = "grens"></paper-input><br>
+       <paper-input required='true' id="wmsurl" floatingLabel label="WMS_URL" value = "http://geodata.nationaalgeoregister.nl/kadastralekaart/wms?"></paper-input><br>
+       <paper-input required='true' id="layername" floatingLabel label="LayerName" value = "grens"></paper-input><br>
        <!--<paper-input required='true' id="layertype" label="LayerType" value = "wms"></paper-input><br>-->
        
-       <core-icon icon="add" on-click={{addlayer}}></core-icon>
+       <core-icon icon="add" on-click="{{addlayer}}"></core-icon>
        </div>
    </core-collapse>
    
@@ -78,6 +91,7 @@
     return this; // for testing purposes
 };
   Polymer({
+  		
       draglayer: null,
       created: function(){
       	  this.map = {};

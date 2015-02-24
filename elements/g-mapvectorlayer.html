@@ -8,8 +8,58 @@
   	
   	reproject: true,
   	created: function(){
+  		var self = this;
   		this.data = [];
-  		this.events = [];
+  		this.events = [{
+			event:'click',
+			action: function(d){
+				d3.event.stopPropagation();
+				d3.event.preventDefault();
+				var offset = 30;
+				d3.select(self.map.mapdiv).selectAll('.menu').remove();
+				var location = [d3.event.offsetX -15, d3.event.offsetY -15];
+				d3.select(self.map.mapdiv).append('paper-fab')
+					.classed('menu', true)
+					.on('click', function(){
+						d3.select(self.map.mapdiv).selectAll('.menu').remove();
+					})
+					.attr('icon', 'create')
+					.attr('mini', 'true')
+					.style('position', 'absolute')
+					.style('left', location[0] + 'px')
+					.style('top', location[1] + 'px')
+					.style('background', 'orange')
+					.transition()
+					.style('left', location[0] + 0 + 'px')
+					.style('top', location[1] + offset + 'px')
+				//Remove	
+				d3.select(self.map.mapdiv).append('paper-fab')
+					.classed('menu', true)
+					.on('click', function(){
+						console.log('Remove feature: ', d.properties.id);
+					})
+					.attr('icon', 'content-cut')
+					.attr('mini', 'true')
+					.style('position', 'absolute')
+					.style('left', location[0] + 'px')
+					.style('top', location[1] + 'px')
+					.style('background', 'red')
+					.transition()
+					.style('left', location[0] + offset + 'px')
+					.style('top', location[1] - offset + 'px');
+				d3.select(self.map.mapdiv).append('paper-fab')
+					.classed('menu', true)
+					.attr('icon', 'editor:format-size')
+					.attr('mini', 'true')
+					.style('position', 'absolute')
+					.style('left', location[0] + 'px')
+					.style('top', location[1] + 'px')
+					.style('background', 'green')
+					.transition()
+					.style('left', location[0] - offset + 'px')
+					.style('top', location[1] - offset + 'px');
+			}
+  		}];
   	},
     attached: function(){
          var self = this;
