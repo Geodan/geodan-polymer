@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script src="../bower_components/webcomponentsjs/webcomponents.js"></script>
     <link rel="import" href="../bower_components/polymer/polymer.html">
+    <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
     <link rel="import" href="../bower_components/core-list/core-list.html">
     <link rel="import" href="../bower_components/core-item/core-item.html">
     <link rel="import" href="../bower_components/core-collapse/core-collapse.html">
@@ -29,6 +30,9 @@
     <link rel="import" href="../bower_components/paper-dropdown/paper-dropdown.html">
     <link rel="import" href="../bower_components/sortable-table/sortable-table.html">
   	<script src="../bower_components/d3/d3.js"></script>
+  	<script src="../bower_components/turf/turf.js"></script>
+  	<script src="../bower_components/terraformer/terraformer.js"></script>
+  	<script src="../bower_components/terraformer-wkt-parser/terraformer-wkt-parser.min.js"></script>
   	<script src="../bower_components/topojson/topojson.js"></script>
     <script src="../bower_components/d3-plugins/geo/tile/tile.js"></script>
     <!--<script src="../bower_components/d3.mappu/dist/d3.mappu.js"></script>-->
@@ -38,6 +42,7 @@
     <link rel="import" href="../elements/g-maprasterlayer.html">
     <link rel="import" href="../elements/g-drawingmenu.html">
     <link rel="import" href="../elements/g-layermngr.html">
+    <link rel="import" href="../elements/g-suggest.html">
     <link rel="import" href="../elements/g-featurelist.html">
     <link rel="import" href="../elements/g-geoservermngr.html">
     <link rel="import" href="../elements/g-trainlayer.html">
@@ -53,6 +58,13 @@
         my-map {
         	height: 100%;
         }
+        .vectorLabel {
+      	  fill: red;
+      	  stroke: white;
+      	  stroke-opacity: 0.5;
+      	  font-size: 12;
+      	  font-weight: bold;
+      }
     </style>
     
     

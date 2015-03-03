@@ -15,7 +15,10 @@
     "core-elements": "Polymer/core-elements#>=0.5.4",
     "d3.mappu": "https://github.com/tomvantilburg/d3.mappu.git",
     "nvd3-community": "~1.7.0",
-    "sortable-table": "~0.11.0"
+    "sortable-table": "~0.11.0",
+    "turf": "~2.0.0",
+    "terraformer": "~1.0.4",
+    "terraformer-wkt-parser": "~1.0.0"
   },
   "resolutions": {
     "d3": ">=3.5.2"

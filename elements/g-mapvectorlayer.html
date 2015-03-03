@@ -1,4 +1,4 @@
-<polymer-element name="g-mapvectorlayer" attributes="name visible reproject">
+<polymer-element name="g-mapvectorlayer" attributes="name visible reproject config">
   <template>
   </template>
   <script>
@@ -13,8 +13,6 @@
   		this.events = [{
 			event:'click',
 			action: function(d){
-				d3.event.stopPropagation();
-				d3.event.preventDefault();
 				var offset = 30;
 				d3.select(self.map.mapdiv).selectAll('.menu').remove();
 				var location = [d3.event.offsetX -15, d3.event.offsetY -15];
@@ -67,15 +65,14 @@
          this.map = map;
          var onclick = function(d,e){
              //Added for testing
-             //d3.event.stopPropagation();
-             //self.map.draw({feature: d});
          }
          
          this.layer = new d3.mappu.VectorLayer(this.name,{
             visible: this.visible,
             reproject: this.reproject,
             duration: this.duration,
-            events: this.events
+            events: this.events,
+            labelfield: 'name'
          }).addTo(map);
          this.layer.data = this.data;
          this.layer.draw();
@@ -83,6 +80,10 @@
      newdata: function(d){
         this.layer.data = d;
 		this.fire('newdata');
+     },
+     adddata: function(d){
+     	 this.layer.addFeature(d); 
+     	 this.fire('newdata');
      }
   });
   </script>

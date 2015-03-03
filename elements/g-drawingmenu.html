@@ -17,6 +17,9 @@
  .list > #deletefab {
  	 background: orange;
  }
+ .list > #deletefab.core-selected {
+ 	 background: green;
+ }
  
  .list > #cancelfab {
  	 background: gray;
@@ -54,7 +57,7 @@ Polymer({
         	var self = this;
         	var featureReady = function(e){
         		self.map.mapdiv.removeEventListener('featureReady', featureReady);
-				var feature = self.sketch.feature;
+				var feature = e.detail;
 				self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
@@ -67,7 +70,7 @@ Polymer({
         	var self = this;
         	var featureReady = function(e){
         		self.map.mapdiv.removeEventListener('featureReady', featureReady);
-				var feature = self.sketch.feature;
+        		var feature = e.detail;
 				self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
@@ -80,7 +83,7 @@ Polymer({
         	var self = this;
         	var featureReady = function(e){
         		self.map.mapdiv.removeEventListener('featureReady', featureReady);
-				var feature = self.sketch.feature;
+				var feature = e.detail;
 				self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
@@ -88,6 +91,12 @@ Polymer({
         	this.sketch.cancel();
         	this.sketch.draw('Polygon');
         	this.map.mapdiv.addEventListener('featureReady', featureReady);
+        },
+        startEdit: function(){
+        	this.sketch.startEdit();
+        },
+        startRemove: function(){
+        	this.sketch.startRemove();
         },
         cancel: function(){
         	this.sketch.cancel();
