@@ -87,7 +87,7 @@
 				url= "/service/pico/geoserver/pico/wms?"
 				layers= 'pico:pico_sjv_sf'
 			></g-maprasterlayer>-->
-		
+		<!--
 			 <g-mapvectorlayer 
 			 	id="gemeenten" 
 			 	name="Gemeenten"
@@ -124,6 +124,7 @@ var tmp;
 				self.$.mapelement.resize();
 				self.$.mapelement.map.zoom = 23;
 				self.$.mapelement.map.center = [5.2,52];
+				self.$.drawmenu.setLayer(self.$.sketch.layer);
 		},1000);
 		this.$.suggest.addEventListener('location', function(d){
 				var center = d.detail.msg.centroid.geometry.coordinates;
