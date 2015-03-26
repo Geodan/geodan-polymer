@@ -10,14 +10,17 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#>=0.5.4",
-    "paper-elements": "Polymer/paper-elements#>=0.5.4",
-    "core-elements": "Polymer/core-elements#>=0.5.4",
+    "polymer": "Polymer/polymer#>=0.5.5",
+    "paper-elements": "Polymer/paper-elements#>=0.5.5",
+    "core-elements": "Polymer/core-elements#>=0.5.5",
     "d3.mappu": "https://github.com/tomvantilburg/d3.mappu.git",
     "nvd3-community": "~1.7.0",
-    "sortable-table": "~0.11.0"
+    "sortable-table": "~0.11.0",
+    "turf": "~2.0.0",
+    "terraformer": "~1.0.4",
+    "terraformer-wkt-parser": "~1.0.0"
   },
   "resolutions": {
-    "d3": ">=3.5.2"
+    "d3": ">=3.5.5"
   }
 }

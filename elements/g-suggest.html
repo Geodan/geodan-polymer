@@ -1,4 +1,6 @@
-<polymer-element name="geodan-suggest">
+<link rel="import" href="../bower_components/core-list/core-list.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<polymer-element name="g-suggest">
   <template>
    <style>
    :host {
@@ -9,7 +11,7 @@
 	 width: 400px;
 	 height: 500px;
 	 position: absolute;
-     z-index: 10; 
+     z-index: 101; 
  }
  .selected {
 	 color: red;
@@ -91,10 +93,21 @@
      	 this.suggestions = [];
      },
      handleLookupResponse: function(e){
-     	 var point = e.detail.response.response.docs[0] ? e.detail.response.response.docs[0].centroid[0] : "";
-     	 var location = point.replace('POINT(', '').replace(')','');
-		 var coords = location.split(' ');
-     	 this.fire('location', {msg: coords});
+     	 if (e.detail.response.response.docs[0]){
+			 var msg = e.detail.response.response.docs[0] ? e.detail.response.response.docs[0] : "";
+			 //msg.centroid = new turf.point(msg.centroid[0].replace('POINT(', '').replace(')','').split(' '));
+			 msg.centroid = {id: 1,type: 'Feature', geometry: Terraformer.WKT.parse(msg.centroid[0]).toJSON()};
+			 msg.geom = {
+			 	id: 1,
+			 	type: 'Feature', 
+			 	geometry: Terraformer.WKT.parse(msg.geom).toJSON(), 
+			 	style: {stroke: 'red', "stroke-width": '1px', fill: 'none'}, 
+			 	properties: {name: msg.displayname}
+			 }; 
+			 console.log(msg);
+			 this.fire('location', {msg: msg});
+			 
+		 }
      }
   });
   

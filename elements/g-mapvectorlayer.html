@@ -1,5 +1,27 @@
-<polymer-element name="g-mapvectorlayer" attributes="name visible reproject">
+<link rel="import" href="../bower_components/core-overlay/core-overlay.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
+<polymer-element name="g-mapvectorlayer" attributes="name visible reproject config">
   <template>
+  <style>
+  .dialog {
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 13px;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		overflow: hidden;
+		background: white;
+		padding:30px 42px;
+		outline: 1px solid rgba(0,0,0,0.2);
+		box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+	}
+	#dialog {
+		width: 500px;
+	}
+	
+  </style>
   </template>
   <script>
   Polymer({
@@ -7,6 +29,9 @@
   	duration: 0,
   	
   	reproject: true,
+  	observe: {
+  		'layer.data':'datachanged'
+  	},
   	created: function(){
   		var self = this;
   		this.data = [];
@@ -14,10 +39,31 @@
 			event:'click',
 			action: function(d){
 				d3.event.stopPropagation();
-				d3.event.preventDefault();
+				var textmenu = function(e){
+					d3.event.stopPropagation();
+					//layered id="confirmation" class="dialog" backdrop transition="core-transition-top"
+					d3.select(self.map.mapdiv).selectAll('.menu').remove();
+					d3.select(self.map.mapdiv).append('core-overlay').classed('menu', true).classed('dialog', true)
+						.attr('opened','true')
+						.style('position', 'absolute')
+						.style('left', location[0] + 'px')
+						.style('top', location[1] + 'px')
+						.append('textarea')
+						.on('click', function(){
+								d3.event.stopPropagation();
+						})
+						.on('blur', function(){
+							d.properties.name = this.value;
+							//TODO: Okay, now it should be saved...
+							self.fire('featchanged', d);
+						})
+						.html(d.properties.name);
+					
+				}
 				var offset = 30;
 				d3.select(self.map.mapdiv).selectAll('.menu').remove();
 				var location = [d3.event.offsetX -15, d3.event.offsetY -15];
+				//edit
 				d3.select(self.map.mapdiv).append('paper-fab')
 					.classed('menu', true)
 					.on('click', function(){
@@ -47,8 +93,10 @@
 					.transition()
 					.style('left', location[0] + offset + 'px')
 					.style('top', location[1] - offset + 'px');
+				//textedit
 				d3.select(self.map.mapdiv).append('paper-fab')
 					.classed('menu', true)
+					.on('click',textmenu)
 					.attr('icon', 'editor:format-size')
 					.attr('mini', 'true')
 					.style('position', 'absolute')
@@ -58,6 +106,9 @@
 					.transition()
 					.style('left', location[0] - offset + 'px')
 					.style('top', location[1] - offset + 'px');
+				d3.select(self.map.mapdiv).on('click', function(){
+					d3.select(self.map.mapdiv).selectAll('.menu').remove();
+				});
 			}
   		}];
   	},
@@ -67,15 +118,15 @@
          this.map = map;
          var onclick = function(d,e){
              //Added for testing
-             //d3.event.stopPropagation();
-             //self.map.draw({feature: d});
          }
          
          this.layer = new d3.mappu.VectorLayer(this.name,{
             visible: this.visible,
             reproject: this.reproject,
             duration: this.duration,
-            events: this.events
+            events: this.events,
+            labels: true,
+            labelfield: 'name'
          }).addTo(map);
          this.layer.data = this.data;
          this.layer.draw();
@@ -83,6 +134,14 @@
      newdata: function(d){
         this.layer.data = d;
 		this.fire('newdata');
+		this.layer.draw(true); //Redraw and rebuild to get events right
+     },
+     adddata: function(d){
+     	 this.layer.addFeature(d); 
+     	 this.fire('newdata');
+     },
+     datachanged: function(){
+     	 this.layer.draw(true);
      }
   });
   </script>

@@ -1,3 +1,6 @@
+<link rel="import" href="../bower_components/core-selector/core-selector.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
 <polymer-element name="g-drawingmenu" attributes="map">
  <template>
  <style>
@@ -17,6 +20,9 @@
  .list > #deletefab {
  	 background: orange;
  }
+ .list > #deletefab.core-selected {
+ 	 background: green;
+ }
  
  .list > #cancelfab {
  	 background: gray;
@@ -24,73 +30,100 @@
        
  </style>
  <core-selector id="drawbuttons" class="list" selected="-1">
-	 <paper-fab mini id="pointfab" icon="room" on-click="{{startPoint}}"></paper-fab>
-	 <paper-fab mini id="linefab" icon="gesture" on-click="{{startLine}}"></paper-fab>
-	 <paper-fab mini id="polygonfab" icon="bookmark" on-click="{{startPolygon}}"></paper-fab>
+	 <paper-fab mini disabled="{{disabled}}" id="pointfab" icon="room" on-click="{{startPoint}}"></paper-fab>
+	 <paper-fab mini disabled="{{disabled}}" id="linefab" icon="gesture" on-click="{{startLine}}"></paper-fab>
+	 <paper-fab mini disabled="{{disabled}}" id="polygonfab" icon="bookmark" on-click="{{startPolygon}}"></paper-fab>
 	 <br>
-	 <paper-fab mini id="editfab" icon="create" on-click="{{startEdit}}"></paper-fab>
-	 <paper-fab mini id="deletefab" icon="content-cut" on-click="{{startRemove}}"></paper-fab>
-	 <paper-fab mini id="cancelfab" icon="remove-circle-outline" on-click="{{cancel}}"></paper-fab>
+	 <paper-fab mini disabled="{{disabled}}" id="editfab" icon="create" on-click="{{startEdit}}"></paper-fab>
+	 <paper-fab mini disabled="{{disabled}}" id="deletefab" icon="content-cut" on-click="{{startRemove}}"></paper-fab>
+	 <paper-fab mini disabled="{{disabled}}" id="cancelfab" icon="remove-circle-outline" on-click="{{finish}}"></paper-fab>
  </core-selector>
 
  </template>
  <script>
 Polymer({
+		disabled: true,
         ready: function(){
         	this.sketch = {};
         	this.map = {};
+        },
+        setLayer: function(layer){
+        	this.sketch = new d3.mappu.Sketch('mysketch', {
+        		layer: layer
+        	});
+        	this.disabled = false;
         },
         addSketchLayer: function(){
         	//TODO: new layer gets incorrect translate and scale factor
         	//var sketchlayer = new d3.mappu.VectorLayer('sketchlayer');
         	//this.map.removeLayer('sketchlayer');
         	//this.map.addLayer(sketchlayer);
-        	this.sketch = new d3.mappu.Sketch('mysketch', {
-        		layer: this.map.getLayersByName('Sketch')[0] //using existing layer for now
-        	});
+        	//this.sketch = new d3.mappu.Sketch('mysketch', {
+        	//	layer: this.map.getLayersByName('Sketch')[0] //using existing layer for now
+        	//});
         },
         
         startPoint: function(){
         	var self = this;
         	var featureReady = function(e){
-        		self.map.mapdiv.removeEventListener('featureReady', featureReady);
-				var feature = self.sketch.feature;
-				self.fire('newfeature', {feature: feature}); 
+        		self.map.mapdiv.removeEventListener('featureCreated', featureReady);
+				//var feature = e.detail;
+				//self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
-        	this.addSketchLayer();
-        	this.sketch.cancel();
+        	//this.addSketchLayer();
+        	this.sketch.finish();
         	this.sketch.draw('Point');
-        	this.map.mapdiv.addEventListener('featureReady', featureReady);
+        	this.map.mapdiv.addEventListener('featureCreated', featureReady);
         },
         startLine: function(){
         	var self = this;
         	var featureReady = function(e){
-        		self.map.mapdiv.removeEventListener('featureReady', featureReady);
-				var feature = self.sketch.feature;
-				self.fire('newfeature', {feature: feature}); 
+        		self.map.mapdiv.removeEventListener('featureCreated', featureReady);
+        		//var feature = e.detail;
+				//self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
-        	this.addSketchLayer();
-        	this.sketch.cancel();
+        	this.sketch.finish();
         	this.sketch.draw('LineString');
-        	this.map.mapdiv.addEventListener('featureReady', featureReady);
+        	this.map.mapdiv.addEventListener('featureCreated', featureReady);
         },
         startPolygon: function(){
         	var self = this;
         	var featureReady = function(e){
-        		self.map.mapdiv.removeEventListener('featureReady', featureReady);
-				var feature = self.sketch.feature;
-				self.fire('newfeature', {feature: feature}); 
+        		self.map.mapdiv.removeEventListener('featureCreated', featureReady);
+				//var feature = e.detail;
+				//self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
-        	this.addSketchLayer();
-        	this.sketch.cancel();
+        	this.sketch.finish();
         	this.sketch.draw('Polygon');
-        	this.map.mapdiv.addEventListener('featureReady', featureReady);
+        	this.map.mapdiv.addEventListener('featureCreated', featureReady);
         },
-        cancel: function(){
-        	this.sketch.cancel();
+        startEdit: function(){
+        	var self = this;
+        	var featureReady = function(e){
+        		self.map.mapdiv.removeEventListener('featureChanged', featureReady);
+				//var feature = e.detail;
+				//self.fire('changedfeature', {feature: feature}); 
+				self.$.drawbuttons.selected = -1;
+			};
+        	this.sketch.startEdit();
+        	this.map.mapdiv.addEventListener('featureChanged', featureReady);
+        },
+        startRemove: function(){
+        	var self = this;
+        	var callback = function(e){
+        		self.map.mapdiv.removeEventListener('featureRemoved', callback);
+				//var feature = e.detail;
+				//self.fire('removedfeature', {feature: feature}); 
+				self.$.drawbuttons.selected = -1;
+			};
+        	this.sketch.startRemove();
+        	this.map.mapdiv.addEventListener('featureRemoved', callback);
+        },
+        finish: function(){
+        	this.sketch.finish();
         	this.$.drawbuttons.selected = -1;
         }
 });
