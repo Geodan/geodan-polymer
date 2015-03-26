@@ -1,0 +1,31 @@
+
+
+
+<html>
+	<script src="../bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="../bower_components/polymer/polymer.html">
+    
+<polymer-element name='my-test'>
+<template>
+Value: {{val}}
+</template>
+
+<script>
+Polymer({
+val: null,
+ready: function(){
+	var a = 'aap';
+	var test = function(){
+		var arr = ['aap','noot'];
+		var arr2 = arr.filter(function(d){
+			return d == a;
+		});
+		return arr2;
+	}
+	this.val = test()[0];
+}
+});
+</script>
+</polymer-element>
+	<my-test></my-test>
+</html>

@@ -1,3 +1,6 @@
+<link rel="import" href="../bower_components/core-selector/core-selector.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+
 <polymer-element name="g-drawingmenu" attributes="map">
  <template>
  <style>
@@ -64,21 +67,21 @@ Polymer({
         	var self = this;
         	var featureReady = function(e){
         		self.map.mapdiv.removeEventListener('featureCreated', featureReady);
-				var feature = e.detail;
-				self.fire('newfeature', {feature: feature}); 
+				//var feature = e.detail;
+				//self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
         	//this.addSketchLayer();
         	this.sketch.finish();
         	this.sketch.draw('Point');
-        	this.map.mapdiv.addEventListener('featureReady', featureReady);
+        	this.map.mapdiv.addEventListener('featureCreated', featureReady);
         },
         startLine: function(){
         	var self = this;
         	var featureReady = function(e){
         		self.map.mapdiv.removeEventListener('featureCreated', featureReady);
-        		var feature = e.detail;
-				self.fire('newfeature', {feature: feature}); 
+        		//var feature = e.detail;
+				//self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
         	this.sketch.finish();
@@ -89,8 +92,8 @@ Polymer({
         	var self = this;
         	var featureReady = function(e){
         		self.map.mapdiv.removeEventListener('featureCreated', featureReady);
-				var feature = e.detail;
-				self.fire('newfeature', {feature: feature}); 
+				//var feature = e.detail;
+				//self.fire('newfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
         	this.sketch.finish();
@@ -101,8 +104,8 @@ Polymer({
         	var self = this;
         	var featureReady = function(e){
         		self.map.mapdiv.removeEventListener('featureChanged', featureReady);
-				var feature = e.detail;
-				self.fire('changedfeature', {feature: feature}); 
+				//var feature = e.detail;
+				//self.fire('changedfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
         	this.sketch.startEdit();
@@ -112,8 +115,8 @@ Polymer({
         	var self = this;
         	var callback = function(e){
         		self.map.mapdiv.removeEventListener('featureRemoved', callback);
-				var feature = e.detail;
-				self.fire('removedfeature', {feature: feature}); 
+				//var feature = e.detail;
+				//self.fire('removedfeature', {feature: feature}); 
 				self.$.drawbuttons.selected = -1;
 			};
         	this.sketch.startRemove();

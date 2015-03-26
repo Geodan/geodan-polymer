@@ -1,0 +1,131 @@
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<polymer-element name="g-cas" attributes="account">
+
+<template>
+	<core-ajax method="get" id="ajaxRequest"
+	   auto
+	   url="https://services.geodan.nl/geocas/whoami.jsp"  
+	   withCredentials=true 
+	   on-core-complete="{{handleResponse}}"></core-ajax>
+	<template if="{{account.ID==undefined}}">
+		<div style="min-height:60px">
+		U bent momenteel niet ingelogd.
+		<br/>
+		<paper-button><a href="https://services.geodan.nl/cas/login?service={{host}}">Inloggen</a></paper-button>
+		</div>
+	</template>
+	<template if="{{account.ID!=undefined}}">
+		Welkom {{account.FirstName}} {{account.LastName}}!
+		<br/>
+		U bent ingelogd als lid van <strong>{{account.Organisation}}</strong>
+	</template>
+</template>
+<script>
+
+Polymer({
+  ready: function() {
+    this.account = this.account || {};
+    
+    this.host = window.location.href.split('?')[0];
+  },
+  handleResponse: function(d) {
+    if(d.detail&&d.detail.xhr&&d.detail.xhr.response&&d.detail.xhr.response.indexOf('{')==0) {
+        this.account = JSON.parse(d.detail.xhr.response);
+    }
+    
+  }
+  });
+</script>
+  
+
+
+<!--template>
+<a href="https://services.geodan.nl/cas/login?service=http://steveno.geodan.nl/2015/pico">login</a>
+</template>
+<script>
+
+Polymer({
+  ready: function() {
+  }
+  });
+</script-->
+  
+<!--template>
+<style>
+#login {
+    background: #3F51B5;
+    color: white;
+}
+#login[disabled] {
+    background: #ececec;
+}
+</style>
+<iframe style="display:none" src="https://services.geodan.nl/geocas/whoami.jsp"></iframe>
+<core-ajax method="post" id="ajaxRequest"
+    auto
+    url="{{url}}"
+    params="{{params}}" 
+   withCredentials=true body='lt=%24%7BloginTicket%7D&username=steven%40geodan.nl&password={{password}}&service=http%3A%2F%2Fsteveno.geodan.nl%2F2015%2Fpico%2F%3F&auto=true'
+    handleAs=""
+    on-core-complete="{{handleResponse}}"></core-ajax>
+<paper-input-decorator floatingLabel='true' id="piduser" label="Gebruikersnaam" error="Gebruikersnaam is een email adres"><input tabindex="1" autofocus id="i_username" on-blur="{{validate}}" is="core-input" value="{{username}}" type="email"/></paper-input-decorator>
+<paper-input-decorator floatingLabel='true' label="Wachtwoord" error="Wachtwoord is verplicht">
+<input  tabindex="2" is="core-input" on-blur="{{validate}}" value="{{password}}" type="password"/>
+</paper-input-decorator>
+<paper-button >annuleer</paper-button><paper-button   on-click="{{loginGeodan}}" id="login"  raised>login</paper-button>
+<!--paper-input-decorator floatingLabel='true' id="piduser" label="Gebruikersnaam" error="Gebruikersnaam is een email adres"><input tabindex="1" autofocus id="i_username" on-blur="{{validate}}" is="core-input" value="{{username}}" type="email"/></paper-input-decorator>
+<paper-input-decorator floatingLabel='true' label="Wachtwoord" error="Wachtwoord is verplicht">
+<input  tabindex="2" is="core-input" on-blur="{{validate}}" value="{{password}}" type="password"/>
+</paper-input-decorator>
+<paper-button >annuleer</paper-button><paper-button  disabled on-click="{{loginGeodan}}" id="login" disabled raised>login</paper-button>
+</template>
+<script>
+
+Polymer({
+  ready: function() {
+    this.username = 'steven@geodan.nl';
+    this.password = 'geodan123';
+  },
+  loginGeodan: function() {
+     var u = this.username = 'steven@geodan.nl';
+     var p = this.password = 'geodan123';
+     var url = "https://services.geodan.nl/cas/login";
+     var params = {};
+     params.method = "POST";
+     params.withCredentials = true;
+     params.username = this.username;
+     params.password = this.password;
+     params.lt = "${flowExecutionKey}";
+     params.auto = "true";
+     params.service = "http://steveno.geodan.nl/2015/pico/";
+     this.params = params;
+     this.$.ajaxRequest.url = url;
+     this.$.ajaxRequest.go();
+   /*  this.$.ajaxRequest.request({url: url, params: params, callback: function(d){
+        console.log(d);
+     }});*/
+     
+     
+  },
+  handleResponse: function(e) {
+    console.log(e);
+  },
+  validate: function(e){
+    if(e.target.value==''||e.target.value===undefined||!e.target.validity.valid)
+    e.target.parentElement.isInvalid = true;
+    else
+    e.target.parentElement.isInvalid = false;
+    if(this.username&&this.password&&this.$.i_username.validity.valid) {
+        this.$.login.disabled = false;
+        this.$.login.tabIndex = 3;
+        this.$.login.focus();
+    }
+  },
+  usernameChanged: function(){
+    console.log(' changed' );
+  }
+});
+</script-->
+</polymer-element>

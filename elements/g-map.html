@@ -11,7 +11,7 @@
  </template>
  <script>
  var tmp;
- (function(){
+ 
  Polymer({
     zoomlevel: 23,
     latitude: 52.2,
@@ -60,8 +60,14 @@
     },
     layers: function(){
         return this.map.layers;
+    },
+    getExtent: function(){
+    	var rect = this.map.mapdiv.getBoundingClientRect();
+    	var ll = this.map.projection.invert([rect.left,rect.bottom]);
+    	var ur = this.map.projection.invert([rect.right,rect.top]);
+    	return [ll,ur];
     }
  });
- })();
+ 
  </script>
 </polymer-element>
