@@ -1,0 +1,305 @@
+<link rel="import" href="../../core-item/core-item.html">
+<link rel="import" href="../../core-drag-drop/core-drag-drop.html">
+<link rel="import" href="../../paper-ripple/paper-ripple.html">
+<link rel="import" href="../../paper-spinner/paper-spinner.html">
+<link rel="import" href="../../paper-slider/paper-slider.html">
+
+<polymer-element name="g-layermanager" attributes="layers map layersReversed">
+<template>
+<style>
+core-collapse {
+    background: rgba(225,225,230,0.4);
+    -webkit-box-shadow: inset 0px 2px 5px 0px rgba(161,161,161,0.62);
+    -moz-box-shadow: inset 0px 2px 5px 0px rgba(161,161,161,0.62);
+    box-shadow: inset 0px 2px 5px 0px rgba(161,161,161,0.62);
+    margin-left: 1px;
+    margin-right: 1px;
+}
+.legendImg, .transparent {    
+    padding: 5px 5px 5px 15px;
+}
+.layerRest {
+    border-top: solid 1px rgb(200,200,200);
+    padding: 5px 15px 5px 15px;
+    font-size: 70%;
+    display: flex;
+}
+.removeLayer {
+    color: red;
+    cursor: pointer;
+}
+.infoLayer {
+    flex: auto;
+    text-align: right;
+    color: #3F51B5;
+    cursor: pointer;
+}
+.infoLayer:hover,.removeLayer:hover {
+    font-weight: bold;
+}
+.layer {
+    border-top: solid 1px rgb(200,200,200);
+    border-bottom: solid 1px white;
+    background: white;
+}
+core-item {
+    cursor: pointer;
+}
+core-collapse {
+    cursor: move;
+}
+.container {
+    -webkit-box-shadow:  0px 2px 5px 0px rgba(161,161,161,0.62);
+    -moz-box-shadow:  0px 2px 5px 0px rgba(161,161,161,0.62);
+    box-shadow:  0px 2px 5px 0px rgba(161,161,161,0.62);
+}
+.picoinfo {
+    background: white;
+    padding: 10px;
+}
+.picoinfourl:hover {
+    font-weight: bold;
+}
+.picoinfourl {
+    text-align: right;
+    margin-top: 10px;
+}
+.zoomin core-item{
+    color: red;
+}
+.legendImg {
+    font-weight: 500;
+}
+.zoomin .legendImg {
+    border: red solid 1px;
+}
+</style>
+<style shim-shadowdom>
+  paper-spinner.black::shadow .circle {
+    border-color: #000;
+  }
+</style>
+<div class="container">
+<h2>Layermngr</h2>
+<template id="layerList" repeat="{{l in layersReversed}}">
+    <div class="layer {{l.minZoom > l.map.zoom?'zoomin':'visible'}}" draggable="true"
+            if="{{l.options.visibility}}"
+            on-dragstart='{{dragStart}}'  
+            on-dragover="{{allowDrop}}"
+            on-dragenter="{{dragenter}}"
+            on-dragleave="{{dragleave}}"
+            on-dragend="{{dragend}}"
+            on-drop='{{dragStop}}' >
+          
+   
+        <core-item  icon="arrow-drop-down" title="{{l.name}}" label="{{l.name}}" on-click="{{toggle}}">
+            <paper-ripple fit></paper-ripple><span flex></span><template if="{{l.minZoom <= l.map.zoom}}"><paper-spinner class="black"  active={{l.loading}}></paper-spinner></template>
+        </core-item>
+        <core-collapse>
+            <div class="layerdetails">
+            <template if="{{!l.options.noopacity}}">
+                <p class="transparent">Opaciteit: <span>{{l.opacity*100 | roundZero}}%</span></p>
+                <paper-slider min="0" max="1" step="0.01" value='1' immediateValue="{{l.opacity}}" on-immediate-value-change="{{setOpacity}}" title="Schuif om de transparantie van de laag in te stellen"></paper-slider>
+                </template>
+                <template if="{{l.minZoom > l.map.zoom}}"><div class="legendImg" draggable="false">
+                U dient {{l.minZoom - l.map.zoom}}x verder in te zoomen om deze laag te kunnen bekijken</div></template>
+                <template if="{{l.options.config.legendUrl&&l.minZoom <= l.map.zoom}}">
+                <div class="legendImg" draggable="false">
+                    <img  draggable="false" src="{{l.options.config.legendUrl}}"/>
+                </div>
+                </template>
+                
+                <div class="layerRest">
+                	<span class="removeLayer" on-click="{{toggleLayer}}">verwijder laag</span>
+                	<template if="{{l.options.config.picoInfo!==undefined}}"><span on-click="{{toggleInfo}}"  class="infoLayer">info</span></template>
+                </div>
+               
+                 <core-collapse class="picoinfo">
+                    <div class="picoinfotext">{{l.options.config.picoInfo.text}}</div>
+                    <template if="{{l.options.config.picoInfo.url}}"><div class="picoinfourl"> <a href="{{l.options.config.picoInfo.url}}" target="_blank">meer info</a></div></template>
+                  </core-collapse>
+            </div>
+        </core-collapse>
+    </div>
+</template>
+</div>
+</template>
+
+<script>
+//Fancy function to easily move items in an array
+//as of: http://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another/
+Array.prototype.move = function (old_index, new_index) {
+    while (old_index < 0) {
+        old_index += this.length;
+    }
+    while (new_index < 0) {
+        new_index += this.length;
+    }
+    if (new_index >= this.length) {
+        var k = new_index - this.length;
+        while ((k--) + 1) {
+            this.push(undefined);
+        }
+    }
+    this.splice(new_index, 0, this.splice(old_index, 1)[0]);   
+};
+Polymer({
+    //filter to remove decimals
+    roundZero: function(value) {
+        return Math.round(value);
+    },
+    draglayer: null,
+    layersChanged: function(e) {
+        
+        
+        if(!e) return false;
+        if( e.length == 0) {
+        if(this.layers.length == 0)return false;
+        }
+        else {
+        if(this.layers.length ==0) {
+            //remove all layers, except the hardcoded ones
+            var map = this.map;
+            map.eachLayer(function(l){
+                //l.off('loading',function(f){
+                //    this.loading = true;
+                //});
+                //l.off('load',function(f){
+                //    this.loading = false;
+                //});
+                if(l.feature || l.options.config) map.removeLayer(l)
+            })
+        }
+        if(e[0].addedCount>0) {
+       
+            this.map.addLayer(this.layers[e[0].index])
+            /*
+             this.layers[e[0].index].on('loading',function(f){
+                    this.loading = true;
+                });
+                this.layers[e[0].index].on('load',function(f){
+                    this.loading = false;
+                });
+                */
+        }
+        else if(e[0].removed !== undefined) {
+        	/*
+            e[0].removed[0].off('loading',function(f){
+                    this.loading = true;
+                });
+                e[0].removed[0].off('load',function(f){
+                    this.loading = false;
+                });
+                */
+            this.map.removeLayer(e[0].removed[0])
+        }
+        }
+        var l = this.layers.slice();
+        l.reverse();
+        this.layersReversed = l;
+        this.orderLayers();
+    },
+    orderLayers: function() {
+        var map = this.map;
+        for(var i=0;i<this.layers.length;i++){
+            if(this.layers[i].map== null) {
+                map.addLayer(this.layers[i])
+				//this.layers[i].on('loading',function(f){
+				//		this.loading = true;
+				//});
+                //this.layers[i].on('load',function(f){
+                //    this.loading = false;
+                //});
+            }
+            //this.layers[i].setZIndex(i);
+        }
+    },
+    setOpacity: function(e,b,c){
+        var layer = c.templateInstance.model.l;
+        //layer.setOpacity(layer.options.opacity);
+    },
+    ready: function() {
+        this.layers = this.layers || [];
+        this.map = this.map || {};    
+    },
+    toggle: function(e) {
+       e.target.parentElement.icon=e.target.parentElement.icon=='arrow-drop-down'?'arrow-drop-up':'arrow-drop-down';
+       e.target.parentElement.nextElementSibling.toggle();
+    },
+    toggleInfo: function(e) {
+        e.target.parentElement.nextElementSibling.toggle();
+    },
+    toggleLayer: function(e,b,c) {
+        var layer = c.templateInstance.model.l; 
+        
+        layer.options.visibility = layer.options.visibility?false:true;
+        if(!layer.options.visibility || layer.options.noopacity){
+            this.layers.splice(this.layers.indexOf(layer),1)
+        }
+    },    
+    dragStart: function(a,b,c){        
+        a.dataTransfer.effectAllowed = 'move';
+        a.dataTransfer.setData('text/html', c.innerHTML);    
+        this.draglayer = c.templateInstance.model.l;
+        this.dropped = false;
+        this.dragged = this.layers.indexOf(this.draglayer);
+        c.firstChild.nextElementSibling.firstElementChild.style.display='none'
+    },
+    dragleave: function(a,b,c){
+        if (c.className.indexOf('layer')>=0){
+            c.style.opacity = 1;
+            c.style.background = '';
+            c.style.border = '';
+            c.style.borderTopColor = 'rgb(200,200,200)';
+            c.style.borderTopWidth = '1px';
+            c.style.borderBottomColor = 'white'
+            c.style.borderBottomWidth = '1px';
+            c.style.borderRadius = '';
+        }
+    },
+    dragend: function(a,b,c) {
+        c.firstElementChild.firstElementChild.style.display = 'block'
+        var fromIndex = this.layers.indexOf(this.draglayer);
+        if(this.dropped) {
+           this.dragged = fromIndex;
+        }
+        this.layers.move(fromIndex, this.dragged);
+    },
+    allowDrop: function(a,b,c){
+        var droponlayer = c.templateInstance.model.l;
+        var toIndex =  this.layers.indexOf(droponlayer);
+        var fromIndex = this.layers.indexOf(this.draglayer);
+        this.layers.move(fromIndex, toIndex);
+        a.preventDefault();
+        a.stopPropagation();
+        if (c.className.indexOf('layer')>=0){
+            var dragstop = c.templateInstance.model.l;
+            c.style.opacity = 0.4;
+            c.style.background = '#fde47f'
+            c.style.borderColor = 'rgb(200,200,200)';
+            c.style.border = '2px dashed';
+            c.style.borderRadius = '4px';
+            
+           
+        }
+    },
+    dragStop: function(a,b,c){
+        this.dropped = true;
+        c.firstChild.nextElementSibling.firstElementChild.style.display='block'
+        c.style.opacity = 1;
+        c.style.background = '';
+        c.style.border = '';
+        c.style.borderTopColor = 'rgb(200,200,200)';
+        c.style.borderTopWidth = '1px';
+        c.style.borderBottomColor = 'white'
+        c.style.borderBottomWidth = '1px';
+        c.style.borderRadius = '';
+        //Make sure the draglayer is moved to a position before the droponlayer in the layer array  
+        var droponlayer = c.templateInstance.model.l;
+        var toIndex =  this.layers.indexOf(droponlayer);
+        var fromIndex = this.layers.indexOf(this.draglayer);
+        this.layers.move(fromIndex, toIndex);
+    }
+});
+</script>
+</polymer-element>

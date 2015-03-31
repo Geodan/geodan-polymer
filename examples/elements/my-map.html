@@ -5,9 +5,11 @@
 <link rel="import" href="../../bower_components/geodan-polymer/elements/g-list.html">
 <link rel="import" href="../../bower_components/geodan-polymer/elements/g-mapvectorlayer.html">
 <link rel="import" href="../../bower_components/geodan-polymer/elements/g-maprasterlayer.html">
-<link rel="import" href="../../bower_components/geodan-polymer/elements/g-layermngr.html">
+<link rel="import" href="../../bower_components/geodan-polymer/elements/g-layermanager.html">
+<link rel="import" href="../../bower_components/geodan-polymer/elements/g-layercatalogus.html">
 <link rel="import" href="../../bower_components/geodan-polymer/elements/g-geoservermngr.html">
 <link rel="import" href="../../bower_components/geodan-polymer/elements/g-dialog.html">
+<link rel="import" href="../../bower_components/geodan-polymer/elements/g-cas.html">
 <polymer-element name='my-map'>
 <template>
     <style>
@@ -15,12 +17,21 @@
           position: relative;
           height: 100%;
       }
+      g-layermanager {
+      	  display: block;
+          position: absolute;
+          left: 10px;
+          top: 50px;
+          width: 400px;
+          z-index: 102;
+      }
       g-layermngr {
           display: block;
           position: absolute;
           left: 10px;
           top: 50px;
           width: 200px;
+          height: 600px;
           z-index: 101;
       }
       g-drawingmenu {
@@ -47,7 +58,14 @@
           width: 400px;
           z-index: 101;
       }
-      
+      g-layercatalogus {
+      	  display: block;
+          position: absolute;
+          right: 10px;
+          top: 50px;
+          width: 400px;
+          z-index: 101;
+      }
       #content {
       	  height: 100%;
       }
@@ -69,11 +87,13 @@
         height: 500px;
       }
     </style>
+    <g-cas account="{{account}}"></g-cas>
+    
     <div id="map">
     	<g-suggest id="suggest"></g-suggest>
     	<g-drawingmenu id="drawmenu" map="{{map}}"></g-drawingmenu>
-		<g-layermngr id="layermngr" map="{{map}}"></g-layermngr>
-	
+		<g-layermanager id="layermngr" map="{{map}}" layers="{{layers}}"></g-layermanager>
+		<g-layercatalogus id="layercatalogus" mapType="d3.mappu" activeLayers="{{layers}}" account="{{account}}" filters="{{filters}}"></g-layercatalogus>
 		<g-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23">
 
 			<g-maprasterlayer 
@@ -129,22 +149,27 @@ var tmp;
 	ready: function(){
 		var self = this;
 		this.layers = [];
+		// Initialize the instance's "list" property to empty array.
+        this.layers = [];
+        this.filters = [];
+        this.account = {};
+        this.activeLayers = [];
 		window.setTimeout(function(){ //FIXME
-				tmp = self.$.mapelement.map;
-				self.$.mapelement.resize();
-				self.$.mapelement.map.zoom = 23;
-				self.$.mapelement.map.center = [5.2,52];
-				self.$.drawmenu.setLayer(self.$.sketch.layer);
+			tmp = self.$.mapelement.map;
+			self.$.mapelement.resize();
+			self.$.mapelement.map.zoom = 23;
+			self.$.mapelement.map.center = [5.2,52];
+			self.$.drawmenu.setLayer(self.$.sketch.layer);
 		},1000);
 		this.$.suggest.addEventListener('location', function(d){
-				var center = d.detail.msg.centroid.geometry.coordinates;
-				self.$.mapelement.map.center = center;
-				//self.$.mapelement.map.zoomToFeature(d.detail.msg.geom); //Doesn't work yet
-				var feat = d.detail.msg.geom;
-				self.$.location.newdata([feat]);
+			var center = d.detail.msg.centroid.geometry.coordinates;
+			self.$.mapelement.map.center = center;
+			//self.$.mapelement.map.zoomToFeature(d.detail.msg.geom); //Doesn't work yet
+			var feat = d.detail.msg.geom;
+			self.$.location.newdata([feat]);
 		});
 		this.$.drawmenu.addEventListener('newfeature', function(d){
-				self.$.sketch.adddata(d.detail.feature);
+			self.$.sketch.adddata(d.detail.feature);
 		});
 		
 		
