@@ -95,7 +95,6 @@
 		<g-layermanager id="layermngr" map="{{map}}" layers="{{layers}}"></g-layermanager>
 		<g-layercatalogus id="layercatalogus" mapType="d3.mappu" activeLayers="{{layers}}" account="{{account}}" filters="{{filters}}"></g-layercatalogus>
 		<g-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23">
-
 			<g-maprasterlayer 
 				id="Mapbox"
 				type="tms"
@@ -195,7 +194,7 @@ var tmp;
 	attached: function(){
 		var self = this;
 		window.setTimeout(function(){ //FIXME
-			self.layers = self.$.mapelement.map.layers.filter(function(d){return d.type == 'vector'});
+			//self.layers = self.$.mapelement.map.layers.filter(function(d){return d.type == 'vector'});
 			self.map = self.$.mapelement.map;
 			self.$.mapelement.resize();
 		},1000);
