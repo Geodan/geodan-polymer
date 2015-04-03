@@ -131,8 +131,7 @@ Polymer({
             }
             var l;
             //create leaflet objects, depending on the layer-type
-            switch (configLayer.source.type)
-            {
+            switch (configLayer.source.type) {
                 case 'OGC_WMS':
                 l = L.tileLayer.wms(
                     configLayer.source.url,
@@ -150,16 +149,20 @@ Polymer({
             }
             return l;
         }
-        var makeMappu = function(configLayer){
+        var makeMappu = function(configLayer) {
         	var l;
-        	l = new d3.mappu.RasterLayer(configLayer.source.featureName, {
-					ogc_type: 'wms',
-					url: configLayer.source.url,
-					layers: configLayer.source.featureName,
-					visible: configLayer.options.visible,
-					config: configLayer,
-					minZoom: 24
-			 });
+        	switch (configLayer.source.type){
+            	case 'OGC_WMS':
+				l = new d3.mappu.RasterLayer(configLayer.source.featureName, {
+						ogc_type: 'wms',
+						url: configLayer.source.url,
+						layers: configLayer.source.featureName,
+						visible: configLayer.options.visible,
+						config: configLayer,
+						minZoom: 24
+				 });
+				 break;
+			}
 			return l;
         }
         switch(this.mapType){

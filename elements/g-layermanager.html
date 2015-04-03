@@ -80,7 +80,6 @@ core-collapse {
   }
 </style>
 <div class="container">
-<h2>Layermngr</h2>
 <template id="layerList" repeat="{{l in layersReversed}}">
     <div class="layer {{l.minZoom > l.map.zoom?'zoomin':'visible'}}" draggable="true"
             if="{{l.options.visibility}}"
@@ -92,7 +91,7 @@ core-collapse {
             on-drop='{{dragStop}}' >
           
    
-        <core-item  icon="arrow-drop-down" title="{{l.name}}" label="{{l.name}}" on-click="{{toggle}}">
+        <core-item  icon="arrow-drop-down" title="{{l.options.config.title || l.name}}" label="{{l.options.config.title || l.name}}" on-click="{{toggle}}">
             <paper-ripple fit></paper-ripple><span flex></span><template if="{{l.minZoom <= l.map.zoom}}"><paper-spinner class="black"  active={{l.loading}}></paper-spinner></template>
         </core-item>
         <core-collapse>
@@ -100,24 +99,25 @@ core-collapse {
             <template if="{{!l.options.noopacity}}">
                 <p class="transparent">Opaciteit: <span>{{l.opacity*100 | roundZero}}%</span></p>
                 <paper-slider min="0" max="1" step="0.01" value='1' immediateValue="{{l.opacity}}" on-immediate-value-change="{{setOpacity}}" title="Schuif om de transparantie van de laag in te stellen"></paper-slider>
-                </template>
-                <template if="{{l.minZoom > l.map.zoom}}"><div class="legendImg" draggable="false">
-                U dient {{l.minZoom - l.map.zoom}}x verder in te zoomen om deze laag te kunnen bekijken</div></template>
-                <template if="{{l.options.config.legendUrl&&l.minZoom <= l.map.zoom}}">
+            </template>
+            <template if="{{l.minZoom > l.map.zoom}}"><div class="legendImg" draggable="false">
+                	U dient {{l.minZoom - l.map.zoom}}x verder in te zoomen om deze laag te kunnen bekijken</div>
+            </template>
+            <template if="{{l.options.config.legendUrl}}"><!--&&l.minZoom <= l.map.zoom}}">-->
                 <div class="legendImg" draggable="false">
                     <img  draggable="false" src="{{l.options.config.legendUrl}}"/>
                 </div>
-                </template>
+            </template>
                 
-                <div class="layerRest">
-                	<span class="removeLayer" on-click="{{toggleLayer}}">verwijder laag</span>
-                	<template if="{{l.options.config.picoInfo!==undefined}}"><span on-click="{{toggleInfo}}"  class="infoLayer">info</span></template>
-                </div>
+			<div class="layerRest">
+				<span class="removeLayer" on-click="{{toggleLayer}}">verwijder laag</span>
+				<template if="{{l.options.config.picoInfo!==undefined}}"><span on-click="{{toggleInfo}}"  class="infoLayer">info</span></template>
+			</div>
                
-                 <core-collapse class="picoinfo">
-                    <div class="picoinfotext">{{l.options.config.picoInfo.text}}</div>
-                    <template if="{{l.options.config.picoInfo.url}}"><div class="picoinfourl"> <a href="{{l.options.config.picoInfo.url}}" target="_blank">meer info</a></div></template>
-                  </core-collapse>
+			<core-collapse class="picoinfo">
+				<div class="picoinfotext">{{l.options.config.picoInfo.text}}</div>
+				<template if="{{l.options.config.picoInfo.url}}"><div class="picoinfourl"> <a href="{{l.options.config.picoInfo.url}}" target="_blank">meer info</a></div></template>
+			</core-collapse>
             </div>
         </core-collapse>
     </div>
@@ -160,14 +160,16 @@ Polymer({
         if(this.layers.length ==0) {
             //remove all layers, except the hardcoded ones
             var map = this.map;
-            map.eachLayer(function(l){
+            //map.eachLayer(function(l){
+            map.layers.forEach(function(l){
                 //l.off('loading',function(f){
                 //    this.loading = true;
                 //});
                 //l.off('load',function(f){
                 //    this.loading = false;
                 //});
-                if(l.feature || l.options.config) map.removeLayer(l)
+                //TT: WHY IS THIS NEEDED?
+                //if(l.feature || l.options.config) map.removeLayer(l);
             })
         }
         if(e[0].addedCount>0) {
@@ -211,7 +213,7 @@ Polymer({
                 //    this.loading = false;
                 //});
             }
-            //this.layers[i].setZIndex(i);
+            this.layers[i].setZIndex(i);
         }
     },
     setOpacity: function(e,b,c){
@@ -279,8 +281,6 @@ Polymer({
             c.style.borderColor = 'rgb(200,200,200)';
             c.style.border = '2px dashed';
             c.style.borderRadius = '4px';
-            
-           
         }
     },
     dragStop: function(a,b,c){
