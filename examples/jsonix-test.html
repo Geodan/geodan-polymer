@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="../bower_components/webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="../bower_components/polymer/polymer.html">
+  	<script src="../bower_components/d3/d3.js"></script>
+  	<script src="../bower_components/d3-plugins/geo/tile/tile.js"></script>
+    <!--<script src="../bower_components/d3.mappu/dist/d3.mappu.js"></script>-->
+    <script src="../../d3.mappu/dist/d3.mappu.js"></script>
+    
+    <link rel="import" href="../bower_components/geodan-polymer/elements/g-wmsreader.html">
+    <link rel="import" href="../bower_components/geodan-polymer/elements/g-map.html">
+    <link rel="import" href="../bower_components/geodan-polymer/elements/g-zoommenu.html">
+    <link rel="import" href="../bower_components/geodan-polymer/elements/g-maprasterlayer.html">
+    <link rel="import" href="../bower_components/geodan-polymer/elements/g-mapvectorlayer.html">
+    <link rel="import" href="../bower_components/paper-input/paper-input.html">
+    <link rel="import" href="../bower_components/core-localstorage/core-localstorage.html">
+
+    <polymer-element name="my-app">
+    	
+		<template>
+		<style>
+    	#map {
+    		position: absolute;
+    		right: 0px;
+    		top: 0px;
+    		width: 50%;
+    		height: 100%;
+    	}
+    	</style>
+			<g-wmsreader url="{{url}}" layers="{{layers}}"></g-wmsreader>
+			<core-localstorage name="my-app-storage" value="{{url}}"></core-localstorage>
+			<g-map id="map"  zoomlevel="8">
+				<g-zoommenu></g-zoommenu>
+				<g-maprasterlayer 
+					name="Mapbox"
+					type="tms"
+					url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
+				></g-maprasterlayer>
+				<g-mapvectorlayer
+					id="extents"
+					name="extents"
+				></g-maprasterlayer>
+			</g-map>
+			<h3>Type a URL to a CORS enabled WMS server</h3>
+			<paper-input value="{{url}}"></paper-input><br>
+			<template repeat="{{layers}}">
+				{{title}} - {{name}}<br>
+			</template>
+			
+	   </template>
+	   <script>
+		Polymer({
+			attached: function(){
+				this.layers = [];
+				this.url = this.url || '/service/geoserver/wms?service=WMS&request=GetCapabilities&version=1.3.0';
+			},
+			layersChanged: function(){
+				var data = [];
+				var counter = 0;
+				this.layers.forEach(function(d){
+					var coords = [[[
+						d.exGeographicBoundingBox.eastBoundLongitude, d.exGeographicBoundingBox.southBoundLatitude
+						],[
+						d.exGeographicBoundingBox.eastBoundLongitude, d.exGeographicBoundingBox.northBoundLatitude	
+						],[
+						d.exGeographicBoundingBox.westBoundLongitude, d.exGeographicBoundingBox.northBoundLatitude	
+						],[
+						d.exGeographicBoundingBox.westBoundLongitude, d.exGeographicBoundingBox.southBoundLatitude	
+						],[
+						d.exGeographicBoundingBox.eastBoundLongitude, d.exGeographicBoundingBox.southBoundLatitude	
+					]]];
+					var feat = {
+						id: counter++,
+						type: 'Feature',
+						geometry: {
+							type: 'Polygon',
+							coordinates: coords
+						},
+						properties:{},
+						style: {
+							fill: 'none',
+							stroke: 'steelBlue'
+						}
+					};
+					data.push(feat);
+				});
+				this.$.extents.newdata(data);
+			}
+		});
+	   </script>
+    </polymer-element>
+  </head>
+
+ <body>
+	<my-app></my-app>	
+ </body>
+</html>

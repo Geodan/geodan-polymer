@@ -1,0 +1,118 @@
+<link rel="import" href="../../core-ajax/core-ajax.html">
+<link rel="import" href="../../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../paper-dropdown/paper-dropdown.html">
+<link rel="import" href="../../paper-item/paper-item.html">
+<link rel="import" href="../../core-menu/core-menu.html">
+
+<polymer-element name="gm-configreader" attributes="account catalogus">
+<template>
+
+<core-ajax id="getConfig"
+    auto
+    url="{{url}}"
+    handeAs="json"
+    on-core-response="{{handleResponse}}"
+    withCredentials=true
+></core-ajax>
+
+<paper-dropdown-menu label="Choose config">
+    <paper-dropdown class="dropdown">
+        <core-menu class="menu" on-core-select="{{selectAction}}">
+        	<template repeat="{{configs}}">
+            	<paper-item value="{{name}}">{{title}}</paper-item>
+            </template>
+        </core-menu>
+    </paper-dropdown>
+</paper-dropdown-menu>
+
+</template>
+<script>
+
+Polymer({
+  docurl: 'https://services.geodan.nl/document/api',
+  configname: null,
+  //Once an GeodanMaps account is acquired it will set the url to request the list of configurations
+  //from the document service.
+  accountChanged: function(){
+    if(this.account.OrganisationCode) {
+        this.$.getConfig.url = this.docurl + '/'+this.account.OrganisationCode+'/config/';
+    }
+  },
+  selectAction: function(e,detail){
+  	  if (detail.isSelected) {
+  	  	  var configname = detail.item.getAttribute('value');
+  	  	  this.setConfig(configname);
+  	  }
+  },
+  //The response from the document service will be parsed here.
+  handleResponse: function(d){   
+    var response = JSON.parse(d.detail.response);
+    if(response.constructor === Array) {
+        //just a list of configs
+        this.configs = response;
+        //TODO: choose which configuration is used (currently the first)
+        this.configname = this.configs[2].name;
+        this.setConfig(this.configname);
+    }
+    else {
+        //actual config
+        var layerset = response.map.layers; 
+        var resolutions = response.map.view.resolutions;
+        //this.parseLayers(this.layers);
+        this.layers = layerset.filter(function(d){return d.source.type});
+        this.updateCatalogus(this.layers);
+    }
+  },
+  setConfig: function(configname){
+  	  this.$.getConfig.url =  this.docurl + '/data/'+this.account.OrganisationCode+'/config/'+configname;
+      this.activeConfig = this.configs[2].title;
+  },
+  //Update the catalogus-tree after a config-change or search-change
+  updateCatalogus: function(layerlist,open) {
+     //the layerlist is a flat list with .groupName and .subgroupName attributes
+     //it needs to be changed into a tree structure with group>subgroup>layer
+     //or group>layer nodes
+     this.catalogus = layerlist.reduce(
+        function(a,l){
+            var group = a.filter(function(d){return d.group == l.groupName});
+            if(group.length == 0) {
+                //create group
+                if(l.subgroupName) {
+                    //create subgroup and add layer
+                    a.push({group:l.groupName,opened:open,layers:[],subgroup:[{subname:l.subgroupName,opened:open,layers:[l]}]});
+                }
+                else {
+                    //layer isn't in a subgroup: add layer to group 
+                    a.push({group:l.groupName,opened:open,subgroup:[],layers:[l]})
+                }
+            }
+            else {
+                if(l.subgroupName) {
+                    var sub = group[0].subgroup.filter(function(d){return d.subname==l.subgroupName});
+                    if(sub.length == 0) {
+                        //create subgroup and add layer
+                        group[0].subgroup.push({subname:l.subgroupName,opened:open,layers:[l]})
+                    }
+                    else {
+                        //add layer to subgroup
+                        sub[0].layers.push(l);
+                    }
+                }
+                else {
+                    //layer isn't in a subgroup: add layer to group 
+                    group[0].layers.push(l)
+                }
+            }
+            return a;
+        }, []);
+  },
+  attached: function() {
+    this.layers = this.layers || [];
+    this.catalogus = this.catalogus || [];
+    this.account = this.account || {};
+    this.configs = [];
+    this.activeConfig = '';
+  }
+});
+</script>
+</polymer-element>

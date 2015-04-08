@@ -1,0 +1,87 @@
+<link rel="import" href="../../core-ajax/core-ajax.html">
+<script src="../bower_components/w3c-schemas/scripts/lib/XLink_1_0.js"></script>
+<script src="../bower_components/ogc-schemas/scripts/lib/WMS_1_3_0.js"></script>
+<script src="../bower_components/jsonix/dist/Jsonix-min.js"></script>
+	
+<polymer-element name="g-wmsreader" attributes="url catalogus">
+<template>
+    <core-ajax id="getCapabilities"
+		url="{{url | parseUrl}}"
+		handeAs="xml"
+		on-core-response="{{handleResponse}}"
+	></core-ajax>
+</template>
+<script>
+
+Polymer({
+  url: '/service/osgis_geoserver/wms',
+  parseUrl: function(url){
+  	  return url + '?service=WMS&request=GetCapabilities&version=1.3.0';
+  },
+  //The response from the document service will be parsed here.
+  handleResponse: function(d){
+  	var result = this.unmarshaller.unmarshalString(d.detail.response);
+  	this.layers = result.WMS_Capabilities.capability.layer.layer;
+  	this.updateCatalogus(this.layers);
+  },
+  attached: function() {
+  	this.catalogus = [];
+    //this.layers = this.layers || [];
+    var context = new Jsonix.Context([XLink_1_0, WMS_1_3_0],
+		{
+			namespacePrefixes : {
+				"http://www.opengis.net/wms" : "",
+				"http://www.w3.org/1999/xlink" : "xlink"
+			},
+			mappingStyle : "simplified"
+		});
+	this.unmarshaller = context.createUnmarshaller();
+	this.$.getCapabilities.go();
+  },
+  //Update the catalogus-tree after a config-change or search-change
+  updateCatalogus: function(layerlist,open) {
+  	/*
+     0: Object
+		groupName: "Gebouwen"
+		info: Object
+		isBaseLayer: false
+		legendUrl: "http://pico.geodan.nl/geoserver/pico/wms?request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=bagagn_dakgrootte&transparent=true&legend_options=fontName:Arial;fontAntiAliasing:true;fontColor:0x000033;fontSize:12"
+		options: Object
+		source: Object
+		title: "Dakgrootte"
+	*/
+	 var self = this;
+	 /*
+	 	TYPE_NAME: "WMS_1_3_0.Layer"
+		boundingBox: Array[2]
+		crs: Array[2]
+		exGeographicBoundingBox: Object
+		keywordList: Object
+		name: "icm_water:GolffrontOudeschild"
+		queryable: true
+		style: Array[1]
+		title: "GolffrontOudeschild"
+	 */
+	 this.catalogus[0] = {group: 'WMS',layers: []};
+	 layerlist.forEach(function(l){
+	 		 self.catalogus[0].layers.push({
+	 		 	groupName: "WMS",
+				info: {fields: {}},
+				isBaseLayer: false,
+				legendUrl: l.style[0].legendURL[0].onlineResource.href, //"http://pico.geodan.nl/geoserver/pico/wms?request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=bagagn_dakgrootte&transparent=true&legend_options=fontName:Arial;fontAntiAliasing:true;fontColor:0x000033;fontSize:12",
+				options: {opacity: 1},
+				source: {
+					contenttype: "image/png",
+					featureName: l.name,
+					type: "OGC_WMS",
+					url: self.url
+				},
+				title: l.name
+	 		 });
+	 });
+	 console.log(this.catalogus);
+	 
+  }
+});
+</script>
+</polymer-element>
