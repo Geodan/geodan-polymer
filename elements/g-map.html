@@ -1,4 +1,4 @@
-<polymer-element name='g-map' attributes='latitude longitude zoomlevel'>
+<polymer-element name='g-map' attributes='latitude longitude zoomlevel layers'>
 
  <template>
   <style>
@@ -7,11 +7,11 @@
 		height: 100%;
 	}
   </style>
+
   <div id="map"></div>
+  <content></content>
  </template>
  <script>
- var tmp;
- 
  Polymer({
     zoomlevel: 23,
     latitude: 52.2,
@@ -58,8 +58,14 @@
     draw: function(d){
         this.map.redraw(d);
     },
-    layers: function(){
-        return this.map.layers;
+    layersChanged: function(e){
+    	if(!e) return false;
+        if(e[0].addedCount>0) {
+        	this.map.addLayer(this.layers[e[0].index]);
+        }
+        else if(e[0].removed !== undefined) {
+        	this.map.removeLayer(e[0].removed[0]);
+        }
     },
     getExtent: function(){
     	var rect = this.map.mapdiv.getBoundingClientRect();

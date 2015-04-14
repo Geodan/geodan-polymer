@@ -1,5 +1,6 @@
 <link rel="import" href="../../core-list/core-list.html">
 <link rel="import" href="../../core-ajax/core-ajax.html">
+<link rel="import" href="../../paper-input/paper-input.html">
 <polymer-element name="g-suggest">
   <template>
    <style>
@@ -20,7 +21,7 @@
    
    </style>
  
-   <input size=40 id="geosuggest" on-keydown="{{suggest}}">
+   <paper-input label="Find location" size=40 id="geosuggest" on-keydown="{{suggest}}"></paper-input>
    	<core-list id="suggestlist" data="{{suggestions}}">
 	  <template>
 		<div class="row {{ {selected: selected} | tokenList }}" on-click="{{lookup}}" value="{{model.id}}" name="{{model.displayname}}">

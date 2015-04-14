@@ -2,17 +2,25 @@
 <polymer-element name="g-zoommenu" attributes="map">
  <template>
  <style>
+ 	#zoommenu {
+ 		position: absolute;
+ 		left: 10px;
+ 		top: 10px;
+ 	}
  </style>
- 
+ <div id="zoommenu">
 	 <paper-fab mini id="zoomIn" icon="add" on-click="{{zoomIn}}"></paper-fab>
 	 <paper-fab mini id="zoomOut" icon="remove" on-click="{{zoomOut}}"></paper-fab>
- 
+ </div>
  
  </template>
  <script>
 Polymer({
 		ready: function(){
         	this.map = {};
+        },
+        attached: function(){
+        	this.map = this.parentElement.map;
         },
 		zoomIn: function(){
 			this.map.zoom++;

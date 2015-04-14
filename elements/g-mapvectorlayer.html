@@ -125,8 +125,9 @@
             reproject: this.reproject,
             duration: this.duration,
             events: this.events,
-            labels: true,
-            labelfield: 'name'
+            minzoom: 1,
+            maxzoom: 26
+            //labelfield: 'name'
          }).addTo(map);
          this.layer.data = this.data;
          this.layer.draw();
