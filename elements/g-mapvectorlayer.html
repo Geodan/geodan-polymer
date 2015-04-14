@@ -35,6 +35,7 @@
   	created: function(){
   		var self = this;
   		this.data = [];
+  		
   		this.events = [{
 			event:'click',
 			action: function(d){
@@ -116,6 +117,7 @@
          var self = this;
          var map = this.parentNode.map;
          this.map = map;
+         this.config = {};
          var onclick = function(d,e){
              //Added for testing
          }
@@ -126,8 +128,8 @@
             duration: this.duration,
             events: this.events,
             minzoom: 1,
-            maxzoom: 26
-            //labelfield: 'name'
+            maxzoom: 26,
+            labelfield: this.config.labelfield || 'name'
          }).addTo(map);
          this.layer.data = this.data;
          this.layer.draw();
