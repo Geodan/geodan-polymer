@@ -1,20 +1,29 @@
 <link rel="import" href="../../core-ajax/core-ajax.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../paper-input/paper-input.html">
 <script src="../bower_components/w3c-schemas/scripts/lib/XLink_1_0.js"></script>
 <script src="../bower_components/ogc-schemas/scripts/lib/WMS_1_3_0.js"></script>
 <script src="../bower_components/jsonix/dist/Jsonix-min.js"></script>
 	
 <polymer-element name="g-wmsreader" attributes="url catalogus">
 <template>
-    <core-ajax id="getCapabilities"
+    <core-ajax
+    	on-core-error="{{error}}"
+    	id="getCapabilities"
 		url="{{url | parseUrl}}"
 		handeAs="xml"
 		on-core-response="{{handleResponse}}"
 	></core-ajax>
+	<paper-input id="addurl" value="{{url}}" label="WMS url"></paper-input>
+	<paper-button on-click="{{reload}}">Set</paper-button><br>
 </template>
 <script>
 
 Polymer({
   url: '/service/osgis_geoserver/wms',
+  reload: function(){
+  	  this.$.getCapabilities.go();
+  },
   parseUrl: function(url){
   	  return url + '?service=WMS&request=GetCapabilities&version=1.3.0';
   },
@@ -22,7 +31,12 @@ Polymer({
   handleResponse: function(d){
   	var result = this.unmarshaller.unmarshalString(d.detail.response);
   	this.layers = result.WMS_Capabilities.capability.layer.layer;
+  	this.title = result.WMS_Capabilities.capability.layer.title;
   	this.updateCatalogus(this.layers);
+  },
+  error: function(e){
+  	  //console.log(e);
+  	  e.detail.xhr.statustext;
   },
   attached: function() {
   	this.catalogus = [];
@@ -62,13 +76,14 @@ Polymer({
 		style: Array[1]
 		title: "GolffrontOudeschild"
 	 */
-	 this.catalogus[0] = {group: 'WMS',layers: []};
+	 this.catalogus[0] = {group: this.title,layers: []};
 	 layerlist.forEach(function(l){
+	 		 var legendUrl = 
 	 		 self.catalogus[0].layers.push({
 	 		 	groupName: "WMS",
 				info: {fields: {}},
 				isBaseLayer: false,
-				legendUrl: l.style[0].legendURL[0].onlineResource.href, //"http://pico.geodan.nl/geoserver/pico/wms?request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=bagagn_dakgrootte&transparent=true&legend_options=fontName:Arial;fontAntiAliasing:true;fontColor:0x000033;fontSize:12",
+				legendUrl: l.style[0] ? l.style[0].legendURL[0] ? l.style[0].legendURL[0].onlineResource.href: null: null, //"http://pico.geodan.nl/geoserver/pico/wms?request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=bagagn_dakgrootte&transparent=true&legend_options=fontName:Arial;fontAntiAliasing:true;fontColor:0x000033;fontSize:12",
 				options: {opacity: 1},
 				source: {
 					contenttype: "image/png",

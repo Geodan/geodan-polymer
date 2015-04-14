@@ -43,8 +43,9 @@ paper-dropdown-menu,paper-dropdown {
     width: 220px;
 }
 </style>
-
+<!--
     <paper-input id="zoekVeld" value="{{search}}" label="Zoek een laag"></paper-input>
+    -->
     <template id="layerList" repeat="{{layer in catalogus}}">
     <div class="group"><core-item class="groupTitle" icon="arrow-drop-down" label="{{layer.group==null?'Generiek':layer.group}}" on-click="{{toggle}}"><paper-ripple fit></paper-ripple></core-item>
         <core-collapse opened="{{layer.opened}}">
@@ -69,6 +70,9 @@ paper-dropdown-menu,paper-dropdown {
 <script>
 
 Polymer({
+	ready: function(){
+		
+	},
   //Walk through the layers to find those matching the search string
   //and update the visible list in the element
   searchChanged: function() {
@@ -77,97 +81,6 @@ Polymer({
         return l.title.toLowerCase().indexOf(zoek.toLowerCase())>=0
     })
     var open=zoek==""?false:true; //to make sure all core-collapse are open when searching
-    /*this.updateCatalogus(resultaat,open);*/
-  },
-  //The response from the document service will be parsed here.
-  STALE: function(d){   
-     /*
-        var resolutions = response.map.view.resolutions;
-        //Leaflet needs zoomlevels to set min/max scalelevel
-        var calcZoom = function(scale) {           
-            var res = 0.28*scale/1000; //standard geoserver scale calculation
-            var zoom =0;            
-            for(var i = 0; i<resolutions.length;i++) {
-                if(res<resolutions[i]) zoom++
-            }
-            return zoom;        
-        };
-        //Parse the GeodanMaps layerset into a set of Leaflet layers
-        var makeLeaflet = function(configLayer) {
-            var minZoom = 0;
-            if(configLayer.options.maxResolution) {
-                minZoom = calcZoom(configLayer.options.maxResolution);
-            }
-            var l;
-            //create leaflet objects, depending on the layer-type
-            switch (configLayer.source.type) {
-                case 'OGC_WMS':
-                l = L.tileLayer.wms(
-                    configLayer.source.url,
-                    {
-                        layers: configLayer.source.featureName,
-                        format: configLayer.source.contenttype?configLayer.source.contenttype:'image/png',
-                        transparent: configLayer.options.transparent,
-                        opacity: configLayer.options.opacity,
-                        visibility: configLayer.options.visible,
-                        config: configLayer,
-                        minZoom: minZoom
-                    }
-                );
-                break;
-            }
-            return l;
-        }
-        var makeMappu = function(configLayer) {
-        	var l;
-        	switch (configLayer.source.type){
-            	case 'OGC_WMS':
-				l = new d3.mappu.RasterLayer(configLayer.source.featureName, {
-						ogc_type: 'wms',
-						url: configLayer.source.url,
-						layers: configLayer.source.featureName,
-						visible: configLayer.options.visible,
-						config: configLayer,
-						minZoom: 24
-				});
-				break;
-				case 'OGC_WMTS': //TODO: work in progress
-				l = new d3.mappu.RasterLayer(configLayer.source.featureName, {
-						ogc_type: 'wmts',
-						url: configLayer.source.url,
-						layers: configLayer.source.featureName,
-						visible: configLayer.options.visible,
-						config: configLayer,
-						minZoom: 24
-				}); 	 
-				break;
-				case 'OGC_TMS': //NOT TESTED YET
-				l = new d3.mappu.RasterLayer(configLayer.source.featureName, {
-						ogc_type: 'tms',
-						url: configLayer.source.url + "/{z}/{x}/{y}.png",
-						visible: configLayer.options.visible,
-						config: configLayer,
-						minZoom: 24
-				});
-				break;
-			}
-			return l;
-        }
-        switch(this.mapType){
-            case 'leaflet': 
-            this.layers = layerset.map(makeLeaflet);
-            break;
-            default:
-            this.layers = layerset
-            .filter(function(d){
-				//only wms at the moment
-            	return d.source.type == 'OGC_WMS';
-            })
-            .map(makeMappu);
-            break;
-        }
-        this.parseLayers(this.layers);
-        */
   },
   //Create the layercatalogus and set the activeLayers (visible in the g-layermanager)
   //attributes that need to change when loading or changing a config should be set here

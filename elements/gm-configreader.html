@@ -24,7 +24,7 @@
         </core-menu>
     </paper-dropdown>
 </paper-dropdown-menu>
-
+<br>
 </template>
 <script>
 
@@ -51,7 +51,7 @@ Polymer({
         //just a list of configs
         this.configs = response;
         //TODO: choose which configuration is used (currently the first)
-        this.configname = this.configs[2].name;
+        this.configname = this.configs[0].name;
         this.setConfig(this.configname);
     }
     else {
@@ -65,7 +65,7 @@ Polymer({
   },
   setConfig: function(configname){
   	  this.$.getConfig.url =  this.docurl + '/data/'+this.account.OrganisationCode+'/config/'+configname;
-      this.activeConfig = this.configs[2].title;
+      this.activeConfig = this.configs[0].title;
   },
   //Update the catalogus-tree after a config-change or search-change
   updateCatalogus: function(layerlist,open) {
@@ -107,11 +107,11 @@ Polymer({
         }, []);
   },
   attached: function() {
-    this.layers = this.layers || [];
-    this.catalogus = this.catalogus || [];
-    this.account = this.account || {};
-    this.configs = [];
-    this.activeConfig = '';
+    //this.layers = this.layers || [];
+    //this.catalogus = this.catalogus || [];
+    //this.account = this.account || {};
+    //this.configs = [];
+    //this.activeConfig = '';
   }
 });
 </script>

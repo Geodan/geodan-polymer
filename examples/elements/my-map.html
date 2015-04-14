@@ -15,24 +15,19 @@
 <link rel="import" href="../../bower_components/geodan-polymer/elements/g-wmsreader.html">
 <link rel="import" href="../../bower_components/geodan-polymer/elements/gm-configreader.html">
 
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="../../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../../bower_components/core-icons/social-icons.html">
+<link rel="import" href="../../bower_components/core-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
 <polymer-element name='my-map'>
 <template>
     <style>
-    /*
-    g-map {
-          position: relative;
+      g-map {
           height: 100%;
       }
-      
-      g-layermngr {
-          display: block;
-          position: absolute;
-          left: 10px;
-          top: 50px;
-          width: 200px;
-          height: 600px;
-          z-index: 101;
-      }*/
       g-layermanager {
       	  display: block;
           position: absolute;
@@ -48,15 +43,7 @@
           bottom: 50px;
           width: 200px;
           z-index: 101;
-      }/*
-      g-geoservermngr {
-          display: block;
-          position: absolute;
-          right: 10px;
-          top: 50px;
-          width: 200px;
-          z-index: 101;
-      }*/
+      }
       g-suggest {
       	  display: block;
           position: absolute;
@@ -65,78 +52,70 @@
           width: 400px;
           z-index: 101;
       }
-      #catalogs {
-      	  display: block;
-          position: absolute;
-          right: 10px;
-          top: 50px;
-          width: 400px;
-          z-index: 101;
-      }
-      g-layercatalogus {
-      	  position: relative;
-      }
-      /*
       #content {
-      	  height: 100%;
+        position: absolute;
+        overflow:auto;
+        height: 100%;
+        width: 100%;
       }
-      
-      #rightbar {
-      	  position: absolute;
-      	  right: 0px;
-      	  top: 0px;
-      	  width: 50%;
-      	  height: 100%;
-      }
-      core-collapse {
-        margin: 10px 0;
-        padding: 15px;
-        display: block !important;
-        min-height: 20px;
-        height: 500px;
-      }*/
       #map {
       	  position: relative;
           height: 100%;
+      }
+      
+      core-header-panel {
+      	  height: 100%;
+      }
+      core-scroll-header-panel {
       	  height: 100%;
       }
     </style>
-    <g-cas account="{{account}}"></g-cas>
     
-    <g-wmsreader url="{{url}}" catalogus="{{wmscatalogus}}"></g-wmsreader>
-    <gm-configreader account="{{account}}" catalogus="{{catalogus}}"></gm-configreader>
+    
+    <paper-dialog id="login" heading="Login" transition="core-transition-center">
+    	<g-cas account="{{account}}"></g-cas>
+    </paper-dialog>
+    
+    <paper-dialog id="catalogues" heading="Catalogues" transition="core-transition-center">
+		<div id="catalogs">
+			<h4>WMS:</h4>
+		    <g-wmsreader url="{{url}}" catalogus="{{wmscatalogus}}"></g-wmsreader>
+			<g-layercatalogus id="wmscatalogus" mapType="d3.mappu" activeLayers="{{layers}}" catalogus="{{wmscatalogus}}"></g-layercatalogus>
+			<hr>
+			<h4>GM-config:</h4>
+			<gm-configreader account="{{account}}" catalogus="{{catalogus}}"></gm-configreader>
+			<g-layercatalogus id="catalogus" mapType="d3.mappu" activeLayers="{{layers}}" catalogus="{{catalogus}}"></g-layercatalogus>
+		</div>
+    </paper-dialog>
+    
+    <core-header-panel flex>
+    <core-toolbar>
+    	<paper-icon-button id="idicon" icon="{{account.ID==undefined?'social:person-outline':'account-circle'}}" on-click="{{toggleLogin}}"></paper-icon-button>
+		<paper-icon-button icon="home" on-click="{{gohome}}"></paper-icon-button>
+		<paper-icon-button  icon="maps:layers" on-click="{{toggleCatalogues}}"></paper-icon-button>
+	</core-toolbar>
+	<div id="content" vertical layout>
     <div id="map">
-		<g-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23">
+		<g-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23" layers="{{layers}}">
 			<g-zoommenu></g-zoommenu>
 			<g-suggest id="suggest"></g-suggest>
 			<g-drawingmenu id="drawmenu" map="{{map}}"></g-drawingmenu>
-			<g-layermanager id="layermngr" map="{{map}}" layers="{{layers}}"></g-layermanager>
+			<g-layermanager id="layermngr" layers="{{layers}}"></g-layermanager>
 			
-			<div id="catalogs">
-				<g-layercatalogus id="wmscatalogus" mapType="d3.mappu" activeLayers="{{layers}}" catalogus="{{wmscatalogus}}"></g-layercatalogus>
-				<g-layercatalogus id="catalogus" mapType="d3.mappu" activeLayers="{{layers}}" catalogus="{{catalogus}}"></g-layercatalogus>
-			</div>
 			<g-maprasterlayer 
 				id="Mapbox"
 				type="tms"
 				url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
 			></g-maprasterlayer>
-			<g-mapvectorlayer id="sketch" name="Sketch"></g-mapvectorlayer>
-			<g-mapvectorlayer id="location" name="Location"></g-mapvectorlayer>
-		<!--			
 			<g-maprasterlayer
 				id="Transport"
 				type="tms"
 				visible='false'
 				url="http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png"
 			></g-maprasterlayer>
-			<g-maprasterlayer 
-				id="pico1"
-				type="wms"
-				visible="false"
-				url= "/service/pico/geoserver/pico/wms?"
-				layers= 'pico:pico_sjv_sf'
-			></g-maprasterlayer>-->
+			<g-mapvectorlayer id="sketch" name="Sketch"></g-mapvectorlayer>
+			<g-mapvectorlayer id="location" name="Location"></g-mapvectorlayer>
+			
 		<!--
 			 <g-mapvectorlayer 
 			 	id="gemeenten" 
@@ -146,6 +125,7 @@
 			 <g-trainlayer id="nslayer" name="Trains" interval="5000"></g-trainlayer>
 		-->
         </g-map>
+        </div>
       </div>
       <!--
       <div id='rightbar' class='list' layout vertical>
@@ -219,7 +199,13 @@ var tmp;
 			self.map = self.$.mapelement.map;
 			self.$.mapelement.resize();
 		},1000);
-	}
+	},
+	toggleLogin: function() {
+		this.$.login.toggle();
+	},
+	toggleCatalogues: function() {
+        this.$.catalogues.toggle();
+    }
   });
 
 </script>

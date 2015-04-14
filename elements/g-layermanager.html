@@ -110,7 +110,7 @@ core-collapse {
             </template>
                 
 			<div class="layerRest">
-				<span class="removeLayer" on-click="{{toggleLayer}}">verwijder laag</span>
+				<span class="removeLayer" on-click="{{removeLayer}}">verwijder laag</span>
 				<template if="{{l.options.config.picoInfo!==undefined}}"><span on-click="{{toggleInfo}}"  class="infoLayer">info</span></template>
 			</div>
                
@@ -150,51 +150,31 @@ Polymer({
     },
     draglayer: null,
     layersChanged: function(e) {
-        
-        
         if(!e) return false;
         if( e.length == 0) {
         if(this.layers.length == 0)return false;
         }
         else {
-        if(this.layers.length ==0) {
-            //remove all layers, except the hardcoded ones
-            var map = this.map;
-            //map.eachLayer(function(l){
-            map.layers.forEach(function(l){
-                //l.off('loading',function(f){
-                //    this.loading = true;
-                //});
-                //l.off('load',function(f){
-                //    this.loading = false;
-                //});
-                //TT: WHY IS THIS NEEDED?
-                //if(l.feature || l.options.config) map.removeLayer(l);
-            })
-        }
-        if(e[0].addedCount>0) {
-       
-            this.map.addLayer(this.layers[e[0].index])
-            /*
-             this.layers[e[0].index].on('loading',function(f){
-                    this.loading = true;
-                });
-                this.layers[e[0].index].on('load',function(f){
-                    this.loading = false;
-                });
-                */
-        }
-        else if(e[0].removed !== undefined) {
-        	/*
-            e[0].removed[0].off('loading',function(f){
-                    this.loading = true;
-                });
-                e[0].removed[0].off('load',function(f){
-                    this.loading = false;
-                });
-                */
-            this.map.removeLayer(e[0].removed[0])
-        }
+			if(e[0].addedCount>0) {
+				/*
+				 this.layers[e[0].index].on('loading',function(f){
+						this.loading = true;
+					});
+					this.layers[e[0].index].on('load',function(f){
+						this.loading = false;
+					});
+					*/
+			}
+			else if(e[0].removed !== undefined) {
+				/*
+				e[0].removed[0].off('loading',function(f){
+						this.loading = true;
+					});
+					e[0].removed[0].off('load',function(f){
+						this.loading = false;
+					});
+					*/
+			}
         }
         var l = this.layers.slice();
         l.reverse();
@@ -205,13 +185,14 @@ Polymer({
         var map = this.map;
         for(var i=0;i<this.layers.length;i++){
             if(this.layers[i].map== null) {
-                map.addLayer(this.layers[i])
-				//this.layers[i].on('loading',function(f){
-				//		this.loading = true;
-				//});
-                //this.layers[i].on('load',function(f){
-                //    this.loading = false;
-                //});
+            	/*
+				this.layers[i].on('loading',function(f){
+						this.loading = true;
+				});
+                this.layers[i].on('load',function(f){
+                    this.loading = false;
+                });
+                */
             }
             this.layers[i].setZIndex(i);
         }
@@ -231,13 +212,13 @@ Polymer({
     toggleInfo: function(e) {
         e.target.parentElement.nextElementSibling.toggle();
     },
-    toggleLayer: function(e,b,c) {
+    removeLayer: function(e,b,c) {
         var layer = c.templateInstance.model.l; 
         
-        layer.options.visibility = layer.options.visibility?false:true;
-        if(!layer.options.visibility || layer.options.noopacity){
+        //layer.options.visibility = layer.options.visibility?false:true;
+        //if(!layer.options.visibility || layer.options.noopacity){
             this.layers.splice(this.layers.indexOf(layer),1)
-        }
+        //}
     },    
     dragStart: function(a,b,c){        
         a.dataTransfer.effectAllowed = 'move';
