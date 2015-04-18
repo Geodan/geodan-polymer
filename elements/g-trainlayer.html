@@ -85,7 +85,7 @@
 		}
   	 	function gettreinen(t){
 			var timestring = t.toISOString();
-			var tok = 'ns:prima14';//NSadmin 20intercity13
+			var tok = null;//put credentials here
 			var datasource_treinen = "http://research.geodan.nl/service/treinen/location/api/positions?username=ns&timestamp="+timestring;
 			d3.json(datasource_treinen,treindataCallback);
 		}
