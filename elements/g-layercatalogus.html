@@ -68,7 +68,7 @@ paper-dropdown-menu,paper-dropdown {
 
 </template>
 <script>
-
+var tmp3;
 Polymer({
 	ready: function(){
 		
@@ -152,7 +152,8 @@ Polymer({
   },
   attached: function() {
     this.mapType = this.mapType || 'leaflet';
-    this.layers = this.layers || [];
+    //this.layers = this.layers || [];
+    tmp3 = this.layers;
     this.catalogus = this.catalogus || [];
     this.activeLayers = this.activeLayers || [];
   }

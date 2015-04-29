@@ -1,10 +1,11 @@
-<polymer-element name="g-maprasterlayer" attributes="name type url layers visible">
+<polymer-element name="g-maprasterlayer" attributes="name type url visible">
   <template>
    <style>
    
    </style>
   </template>
   <script>
+  var tmp2;
   Polymer({
   	 visible: true,
   	 created: function(){
@@ -21,13 +22,19 @@
          }
          
          
-         this.layer = new d3.mappu.RasterLayer(this.id,  {
+         this.layer = new d3.mappu.RasterLayer(this.name,  {
             ogc_type: this.type,
             url: this.url,
             layers: this.layers,
-            visible: this.visible
-         }).addTo(map);
-         this.layer.draw();
+            visible: this.visible,
+            config: {
+					title: this.name
+			},
+         })
+         .addTo(map);
+         //this.layer.draw();
+         this.parentElement.layers.push(this.layer);
+         tmp2 = this.parentElement.layers;
      }
   });
   </script>
