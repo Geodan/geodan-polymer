@@ -12,6 +12,7 @@
   <content></content>
  </template>
  <script>
+ 
  Polymer({
     zoomlevel: 23,
     latitude: 52.2,
@@ -23,12 +24,13 @@
     created: function(){
          this.features = [];
          this.center = [];
-    },
+      },
     attached: function(){
         this.map = new d3.mappu.Map(this.$.map,{
             center: [this.longitude,this.latitude],
         });
         this.map.zoom = this.zoomlevel;
+        this.layers = this.layers || [];
     },
     resize: function(){
     	this.map.resize();

@@ -1,9 +1,9 @@
 <link rel="import" href="../../core-ajax/core-ajax.html">
 <link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../../paper-input/paper-input.html">
-<script src="../bower_components/w3c-schemas/scripts/lib/XLink_1_0.js"></script>
-<script src="../bower_components/ogc-schemas/scripts/lib/WMS_1_3_0.js"></script>
-<script src="../bower_components/jsonix/dist/Jsonix-min.js"></script>
+<script src="../../w3c-schemas/scripts/lib/XLink_1_0.js"></script>
+<script src="../../ogc-schemas/scripts/lib/WMS_1_3_0.js"></script>
+<script src="../../jsonix/dist/Jsonix-min.js"></script>
 	
 <polymer-element name="g-wmsreader" attributes="url catalogus">
 <template>
@@ -78,24 +78,30 @@ Polymer({
 	 */
 	 this.catalogus[0] = {group: this.title,layers: []};
 	 layerlist.forEach(function(l){
-	 		 var legendUrl = 
-	 		 self.catalogus[0].layers.push({
-	 		 	groupName: "WMS",
-				info: {fields: {}},
-				isBaseLayer: false,
-				legendUrl: l.style[0] ? l.style[0].legendURL[0] ? l.style[0].legendURL[0].onlineResource.href: null: null, //"http://pico.geodan.nl/geoserver/pico/wms?request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=bagagn_dakgrootte&transparent=true&legend_options=fontName:Arial;fontAntiAliasing:true;fontColor:0x000033;fontSize:12",
-				options: {opacity: 1},
-				source: {
-					contenttype: "image/png",
-					featureName: l.name,
-					type: "OGC_WMS",
-					url: self.url
-				},
-				title: l.name
-	 		 });
+	 	try {
+	 		 var legendUrl = l.style[0] ? l.style[0].legendURL[0] ? l.style[0].legendURL[0].onlineResource.href: null: null;
+	 	}
+	 	catch(err){
+	 		var legendUrl = null;
+	 		console.warn(err.message);
+	 	}
+		self.catalogus[0].layers.push({
+			groupName: "WMS",
+			info: {fields: {}},
+			isBaseLayer: false,
+			legendUrl: legendUrl,//"http://pico.geodan.nl/geoserver/pico/wms?request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=bagagn_dakgrootte&transparent=true&legend_options=fontName:Arial;fontAntiAliasing:true;fontColor:0x000033;fontSize:12",
+			options: {opacity: 1},
+			source: {
+				contenttype: "image/png",
+				featureName: l.name,
+				type: "OGC_WMS",
+				url: self.url
+			},
+			title: l.name
+		 });
+	 		 
+	 		 
 	 });
-	 console.log(this.catalogus);
-	 
   }
 });
 </script>

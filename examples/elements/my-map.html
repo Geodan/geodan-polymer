@@ -96,15 +96,15 @@
 	</core-toolbar>
 	<div id="content" vertical layout>
     <div id="map">
+    	<g-zoommenu></g-zoommenu>
+		<g-suggest id="suggest"></g-suggest>
+		<g-drawingmenu id="drawmenu" map="{{map}}"></g-drawingmenu>
+		<g-layermanager id="layermngr" activeLayers="{{layers}}"></g-layermanager>
 		<g-map id="mapelement" latitude="52.2" longitude="5.2" zoomlevel="23" layers="{{layers}}">
-			<g-zoommenu></g-zoommenu>
-			<g-suggest id="suggest"></g-suggest>
-			<g-drawingmenu id="drawmenu" map="{{map}}"></g-drawingmenu>
-			<g-layermanager id="layermngr" layers="{{layers}}"></g-layermanager>
-			
 			<g-maprasterlayer 
 				id="Mapbox"
 				type="tms"
+				visible="true"
 				url="http://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png"
 			></g-maprasterlayer>
 			<g-maprasterlayer
@@ -113,34 +113,11 @@
 				visible='false'
 				url="http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png"
 			></g-maprasterlayer>
-			<g-mapvectorlayer id="sketch" name="Sketch"></g-mapvectorlayer>
+			<g-mapvectorlayer id="sketch" name="Sketch" config="{{layerconfig}}"></g-mapvectorlayer>
 			<g-mapvectorlayer id="location" name="Location"></g-mapvectorlayer>
-			
-		<!--
-			 <g-mapvectorlayer 
-			 	id="gemeenten" 
-			 	name="Gemeenten"
-			 	visible="true"
-			 ></g-mapvectorlayer>	 <!--
-			 <g-trainlayer id="nslayer" name="Trains" interval="5000"></g-trainlayer>
-		-->
         </g-map>
         </div>
       </div>
-      <!--
-      <div id='rightbar' class='list' layout vertical>
-      	<input type="text" id="selectedInterval" onfocus="this.select();" value="5000">
-      	<input type="button" value="interval" on-click="{{selectInterval}}">
-      	<core-selector selected="{{selected}}">
-		  <template repeat="{{layer,i in layers}}">
-			<core-collapse opened?="{{selected == i}}" fixedSize style="height:600px">
-			  <h4>{{layer.name}}</h4>
-			  <g-featurelist layer="{{layer}}"></g-featurelist>
-			</core-collapse>
-		  </template>
-		</core-selector>
-      </div>
-      -->
 </template>
 
 <script>
@@ -149,6 +126,7 @@ var tmp;
 	ready: function(){
 		var self = this;
 		this.layers = [];
+		this.layerconfig = {labelfield: 'name'};
 		// Initialize the instance's "list" property to empty array.
         this.layers = [];
         this.filters = [];
@@ -172,9 +150,6 @@ var tmp;
 			self.$.sketch.adddata(d.detail.feature);
 		});
 		
-		
-		//this.trains = this.$.nslayer.trains;
-		
 		d3.json("../../d3.mappu/test/gemeenten_simple.topojson", function(error, data) {
 		  if (error) return console.error(error);
 		  var feats = topojson.feature(data, data.objects.gemeenten).features;
@@ -188,9 +163,6 @@ var tmp;
 		  //self.$.gemeenten.newdata(feats);
 		});
 		
-	},
-	selectInterval: function(){
-		//this.$.nslayer.interval = parseInt(this.$.selectedInterval.value);
 	},
 	attached: function(){
 		var self = this;
