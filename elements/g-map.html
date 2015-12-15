@@ -26,8 +26,10 @@
          this.center = [];
       },
     attached: function(){
-        this.map = new d3.mappu.Map(this.$.map,{
+        this.map = this.map || new d3.mappu.Map(this.$.map,{
             center: [this.longitude,this.latitude],
+            minZoom: 1,
+            maxZoom: 26
         });
         this.map.zoom = this.zoomlevel;
         this.layers = this.layers || [];

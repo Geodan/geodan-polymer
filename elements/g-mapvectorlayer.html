@@ -1,5 +1,8 @@
 <link rel="import" href="../../core-overlay/core-overlay.html">
 <link rel="import" href="../../paper-fab/paper-fab.html">
+<script src="../bower_components/terraformer/terraformer.min.js"></script>
+<script src="../bower_components/terraformer-wkt-parser/terraformer-wkt-parser.min.js"></script>
+
 
 <polymer-element name="g-mapvectorlayer" attributes="name visible reproject config">
   <template>
@@ -35,7 +38,7 @@
   	created: function(){
   		var self = this;
   		this.data = [];
-  		
+  		//TODO: this menu should be moved out of g-mapvectorlayer since it may have functionality that is beyond scope
   		this.events = [{
 			event:'click',
 			action: function(d){
@@ -56,10 +59,29 @@
 						.on('blur', function(){
 							d.properties.name = this.value;
 							//TODO: Okay, now it should be saved...
-							self.fire('featchanged', d);
+							self.fire('changeFeature', d);
 						})
 						.html(d.properties.name);
 					
+				}
+				var populator = function(e){
+					var populatorCallback = function(x){
+						var aantal = x.data.aantal_won;
+						d.properties.name = "aantal inwoners: " + aantal;
+						self.fire('changeFeature', d);
+					}
+
+					d3.event.stopPropagation();
+					d3.select(self.map.mapdiv).selectAll('.menu').remove();
+					//Prepare geometry
+					var toproj = proj4.Proj('+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.999908 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +no_defs ');
+					var geojson = JSON.parse(JSON.stringify(d)); //Clone object
+					Terraformer.Tools.applyConverter(geojson, function(coordinate){
+						return proj4(toproj,coordinate);
+					});
+					var geom = Terraformer.WKT.convert(geojson.geometry);
+					var url = '/sites/geofort/icm/data/populator.php';
+					d3.json(url+'?geom='+JSON.stringify(geojson.geometry),populatorCallback);
 				}
 				var offset = 30;
 				d3.select(self.map.mapdiv).selectAll('.menu').remove();
@@ -69,6 +91,7 @@
 					.classed('menu', true)
 					.on('click', function(){
 						d3.select(self.map.mapdiv).selectAll('.menu').remove();
+						self.fire('editFeature', d);
 					})
 					.attr('icon', 'create')
 					.attr('mini', 'true')
@@ -77,13 +100,13 @@
 					.style('top', location[1] + 'px')
 					.style('background', 'orange')
 					.transition()
-					.style('left', location[0] + 0 + 'px')
+					.style('left', location[0] + offset + 'px')
 					.style('top', location[1] + offset + 'px')
 				//Remove	
 				d3.select(self.map.mapdiv).append('paper-fab')
 					.classed('menu', true)
 					.on('click', function(){
-						console.log('Remove feature: ', d.properties.id);
+						self.fire('removeFeature', d);
 					})
 					.attr('icon', 'content-cut')
 					.attr('mini', 'true')
@@ -107,6 +130,21 @@
 					.transition()
 					.style('left', location[0] - offset + 'px')
 					.style('top', location[1] - offset + 'px');
+				//populator
+				if (d.geometry.type == 'Polygon'){
+				d3.select(self.map.mapdiv).append('paper-fab')
+					.classed('menu', true)
+					.on('click',populator)
+					.attr('icon', 'social:people')
+					.attr('mini', 'true')
+					.style('position', 'absolute')
+					.style('left', location[0] + 'px')
+					.style('top', location[1] + 'px')
+					.style('background', 'steelblue')
+					.transition()
+					.style('left', location[0] - offset + 'px')
+					.style('top', location[1] + offset + 'px');
+				}
 				d3.select(self.map.mapdiv).on('click', function(){
 					d3.select(self.map.mapdiv).selectAll('.menu').remove();
 				});
