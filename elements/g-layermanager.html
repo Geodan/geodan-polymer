@@ -98,7 +98,7 @@ core-collapse {
             <div class="layerdetails">
             <template if="{{!l.options.noopacity}}">
                 <p class="transparent">Opaciteit: <span>{{l.opacity*100 | roundZero}}%</span></p>
-                <paper-slider min="0" max="1" step="0.01" value='1' immediateValue="{{l.opacity}}" on-immediate-value-change="{{setOpacity}}" title="Schuif om de transparantie van de laag in te stellen"></paper-slider>
+                <paper-slider min="0" max="1" step="0.01" value='{{l.opacity}}' immediateValue="{{l.opacity}}" on-immediate-value-change="{{setOpacity}}" title="Schuif om de transparantie van de laag in te stellen"></paper-slider>
             </template>
             <template if="{{l.minZoom > l.map.zoom}}"><div class="legendImg" draggable="false">
                 	U dient {{l.minZoom - l.map.zoom}}x verder in te zoomen om deze laag te kunnen bekijken</div>
@@ -110,7 +110,7 @@ core-collapse {
             </template>
                 
 			<div class="layerRest">
-				<span class="removeLayer" on-click="{{removeLayer}}">verwijder laag</span>
+				<span class="removeLayer" on-click="{{removeLayer}}">Remove</span>
 				<template if="{{l.options.config.picoInfo!==undefined}}"><span on-click="{{toggleInfo}}"  class="infoLayer">info</span></template>
 			</div>
                
@@ -149,33 +149,7 @@ Polymer({
         return Math.round(value);
     },
     draglayer: null,
-    layersChanged: function(e) {
-        if(!e) return false;
-        if( e.length == 0) {
-        if(this.layers.length == 0)return false;
-        }
-        else {
-			if(e[0].addedCount>0) {
-				/*
-				 this.layers[e[0].index].on('loading',function(f){
-						this.loading = true;
-					});
-					this.layers[e[0].index].on('load',function(f){
-						this.loading = false;
-					});
-					*/
-			}
-			else if(e[0].removed !== undefined) {
-				/*
-				e[0].removed[0].off('loading',function(f){
-						this.loading = true;
-					});
-					e[0].removed[0].off('load',function(f){
-						this.loading = false;
-					});
-					*/
-			}
-        }
+    layersChanged: function() {
         var l = this.layers.slice();
         l.reverse();
         this.layersReversed = l;
@@ -184,22 +158,13 @@ Polymer({
     orderLayers: function() {
         var map = this.map;
         for(var i=0;i<this.layers.length;i++){
-            if(this.layers[i].map== null) {
-            	/*
-				this.layers[i].on('loading',function(f){
-						this.loading = true;
-				});
-                this.layers[i].on('load',function(f){
-                    this.loading = false;
-                });
-                */
-            }
             this.layers[i].setZIndex(i);
         }
     },
     setOpacity: function(e,b,c){
         var layer = c.templateInstance.model.l;
         //layer.setOpacity(layer.options.opacity);
+        this.layersChanged();
     },
     ready: function() {
         this.layers = this.layers || [];

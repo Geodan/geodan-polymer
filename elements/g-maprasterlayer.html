@@ -1,4 +1,4 @@
-<polymer-element name="g-maprasterlayer" attributes="name type url visible">
+<polymer-element name="g-maprasterlayer" attributes="name type url visible opacity">
   <template>
    <style>
    
@@ -8,6 +8,7 @@
   var tmp2;
   Polymer({
   	 visible: true,
+  	 opacity: 1,
   	 created: function(){
   	 	 this.data = [];
   	 },
@@ -27,13 +28,14 @@
             url: this.url,
             layers: this.layers,
             visible: this.visible,
+            opacity: this.opacity,
             config: {
 					title: this.name
 			},
          })
          .addTo(map);
          //this.layer.draw();
-         this.parentElement.layers.push(this.layer);
+         this.parentNode.layers.push(this.layer);
          tmp2 = this.parentElement.layers;
      }
   });
